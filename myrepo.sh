@@ -395,9 +395,14 @@ dual_makepkg() {
 #          get new git version to file 'PkgName-newver'
 #          if `makepkg` fail, return 1; if tarball broken, return 2
 build_aur_pkg() {
-    local name="$1" aurVer="$2" tarURL="$3"
+    local name="$1" locVer="$2" aurVer="$3" tarURL="$4"
     local newVer ret
 
+    # pkgver-pkgrel, if pkgver is same, then no need to download sources again.
+    if [ ${locVer%-*} == ${aurVer%-*} ];then
+        [ -f $SRCS/$name-$locVer.src.tar.gz ] && \
+            tar zxf $SRCS/$name-$locVer.src.tar.gz $O_V -C $TEMP 
+    fi
     # get tarball and extract to $TEMP
     if curl -Lfs $tarURL |tar xfz - -C $TEMP $O_V;then
         dual_makepkg $TEMP/$name || ret=$?
@@ -970,7 +975,7 @@ update_aur() {
             tarballURL=$AURURL$(get_aur_info -p $name)
             ((i++))
             msg "$(gettext "(%s/%s) Updating package %s(%s=>%s) from AUR")" "$i" "${#up_name[@]}" "$name" "$loc_ver" "$aur_ver"
-            if build_aur_pkg $name $aur_ver $tarballURL;then
+            if build_aur_pkg $name $loc_ver $aur_ver $tarballURL;then
                 [[ -f $TEMP/$name/$name-newver ]] && aur_ver=$(cat $TEMP/$name/$name-newver)
                 add_package $TEMP/$name/$name-$aur_ver.src.tar.gz
                 msg "$(gettext "Update package %s(%s=>%s) from AUR, done.")" "$name" "$loc_ver" "$aur_ver"
@@ -1152,9 +1157,9 @@ else
     if ! mkdir -p $TEMP;then
         error "$(gettext "Failed to create %s !")" "$TEMP"
         exit 4
-    else
-        echo $$ >$TEMP/myrepo.lock
     fi
+    echo $$ >$TEMP/myrepo.lock
+    trap '{ rm $TEMP/myrepo.lock; } 2>/dev/null' EXIT
     # operations
     for oper in $OPER; do
         case $oper in
@@ -1168,6 +1173,5 @@ else
             *) msg "Unknown option." ;;
         esac
     done
-    rm $TEMP/myrepo.lock
 fi
 exit 0
