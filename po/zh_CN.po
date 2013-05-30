@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: myrepo 0.1\n"
+"Project-Id-Version: myrepo 0.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-21 12:28+0800\n"
+"POT-Creation-Date: 2013-05-24 22:08+0800\n"
 "PO-Revision-Date: 2013-03-12 17:24+0800\n"
 "Last-Translator: shmilee <shmilee.zju@gmail.com>\n"
 "Language-Team: Chinese (simplified) <shmilee.zju@gmail.com>\n"
@@ -65,7 +65,7 @@ msgstr "创建目录失败。"
 msgid "%s Creating files:\\n%s"
 msgstr "%s 创建文件：\\n%s"
 
-#: myrepo.sh:152 myrepo.sh:1158
+#: myrepo.sh:152 myrepo.sh:1163
 msgid "Failed to create %s !"
 msgstr "创建%s失败！"
 
@@ -89,8 +89,8 @@ msgstr "构建i686架构的软件包 .. 失败。"
 msgid "Merging two different source files ..."
 msgstr "正在合并两个不同的源码包文件 ..."
 
-#: myrepo.sh:377 myrepo.sh:682 myrepo.sh:884 myrepo.sh:892 myrepo.sh:905
-#: myrepo.sh:1016
+#: myrepo.sh:377 myrepo.sh:682 myrepo.sh:889 myrepo.sh:897 myrepo.sh:910
+#: myrepo.sh:1021
 msgid "Done."
 msgstr "完成。"
 
@@ -183,12 +183,12 @@ msgstr "正在复制软件包文件%s ..."
 msgid "Use USER-ID %s to sign pkg %s ..."
 msgstr "用%s的私钥为软件包%s创建签名 ..."
 
-#: myrepo.sh:583 myrepo.sh:685 myrepo.sh:903
+#: myrepo.sh:583 myrepo.sh:685 myrepo.sh:908
 msgid "Renew pool database %s ..."
 msgstr "更新pool的数据库%s ..."
 
-#: myrepo.sh:591 myrepo.sh:644 myrepo.sh:729 myrepo.sh:850 myrepo.sh:915
-#: myrepo.sh:1010 myrepo.sh:1026
+#: myrepo.sh:591 myrepo.sh:644 myrepo.sh:729 myrepo.sh:855 myrepo.sh:920
+#: myrepo.sh:1015 myrepo.sh:1031
 msgid "%s may be broken, check it by youself!"
 msgstr "%s可能已损坏，请您手动检查一下！"
 
@@ -196,7 +196,7 @@ msgstr "%s可能已损坏，请您手动检查一下！"
 msgid "Finish adding package %s to REPO: %s."
 msgstr "添加软件%s到软件源%s完毕。"
 
-#: myrepo.sh:618 myrepo.sh:1029
+#: myrepo.sh:618 myrepo.sh:1034
 msgid "Find %s versions of package %s in %s:\\n%s"
 msgstr "找到%s个版本的软件%s，位于%s：\\n%s"
 
@@ -212,7 +212,7 @@ msgstr "未删除任何软件！"
 msgid "Find one package %s in %s to remove."
 msgstr "只找到一个版本的软件%s，将要从%s中删除它。"
 
-#: myrepo.sh:634 myrepo.sh:966 myrepo.sh:1154
+#: myrepo.sh:634 myrepo.sh:971 myrepo.sh:1159
 msgid "Press ENTER to continue, any other to skip: "
 msgstr "按回车键ENTER继续，其他任意键跳过："
 
@@ -248,7 +248,7 @@ msgstr "软件包%s从软件源%s中删除完毕。"
 msgid "Finish removing package %s (versions %s) from REPO: %s."
 msgstr "软件包%s(版本%s)从软件源%s中删除完毕。"
 
-#: myrepo.sh:705 myrepo.sh:1048
+#: myrepo.sh:705 myrepo.sh:1053
 msgid "Package %s do not exist in repo."
 msgstr "软件%s在软件源中不存在。"
 
@@ -264,245 +264,245 @@ msgstr "(%s/%s) %s : 正在检查软件 ..."
 msgid "Ignore."
 msgstr "忽略。"
 
-#: myrepo.sh:758
+#: myrepo.sh:763
 msgid "%s versions(%s) in pool."
 msgstr "pool中有%s个版本（%s）。"
 
-#: myrepo.sh:782
+#: myrepo.sh:787
 msgid "Latest version %s in os."
 msgstr "os中最新版本应该是%s。"
 
-#: myrepo.sh:811 myrepo.sh:987
+#: myrepo.sh:816 myrepo.sh:992
 msgid "Report:"
 msgstr "报告："
 
-#: myrepo.sh:812 myrepo.sh:818
+#: myrepo.sh:817 myrepo.sh:823
 msgid "%s In %s"
 msgstr "%s 在%s中"
 
-#: myrepo.sh:814 myrepo.sh:820
+#: myrepo.sh:819 myrepo.sh:825
 msgid "All files are fine."
 msgstr "所有文件均完好。"
 
-#: myrepo.sh:816 myrepo.sh:822
+#: myrepo.sh:821 myrepo.sh:827
 msgid "Some packages are wrong:\\n%s"
 msgstr "一些有问题的文件：\\n%s"
 
-#: myrepo.sh:824
+#: myrepo.sh:829
 msgid "%s Excess files:"
 msgstr "%s 多余的文件："
 
-#: myrepo.sh:830 myrepo.sh:831 myrepo.sh:832 myrepo.sh:833 myrepo.sh:834
-#: myrepo.sh:835
+#: myrepo.sh:835 myrepo.sh:836 myrepo.sh:837 myrepo.sh:838 myrepo.sh:839
+#: myrepo.sh:840
 msgid "In %s:\\n%s"
 msgstr "在%s中：\\n%s"
 
-#: myrepo.sh:840
+#: myrepo.sh:845
 msgid "None."
 msgstr "无。"
 
-#: myrepo.sh:860
+#: myrepo.sh:865
 msgid "%s packages in REPO: %s."
 msgstr "有%s个软件位于软件源%s中。"
 
-#: myrepo.sh:861
+#: myrepo.sh:866
 msgid "%s packages in list_AUR:\\n%s"
 msgstr "其中%s个软件存在于list_AUR中：\\n%s"
 
-#: myrepo.sh:862
+#: myrepo.sh:867
 msgid "%s packages not in list_AUR:\\n%s"
 msgstr "另外%s个软件不在list_AUR中：\\n%s"
 
-#: myrepo.sh:865
+#: myrepo.sh:870
 msgid ""
 "Use 'add [names]' or 'del [names]' to add(delete) package to(from) list_AUR."
 msgstr "用命令'add [names]'或'del [names]'在list_AUR中添加或删除软件名。"
 
-#: myrepo.sh:866
+#: myrepo.sh:871
 msgid "Use 'finish' to exit this loop."
 msgstr "用命令'finish'结束添加或删除。"
 
-#: myrepo.sh:867
+#: myrepo.sh:872
 msgid "Enter you command: "
 msgstr "请输入您的命令："
 
-#: myrepo.sh:873
+#: myrepo.sh:878
 msgid "Ignore %s, because %s is not in %s."
 msgstr "忽略%s，因为软件%s不在%s中。"
 
-#: myrepo.sh:877
+#: myrepo.sh:882
 msgid "Nothing to do with list_AUR."
 msgstr "无需修改list_AUR。"
 
-#: myrepo.sh:881
+#: myrepo.sh:886
 msgid "Adding %s to list_AUR ..."
 msgstr "正在把%s加到list_AUR中 ..."
 
-#: myrepo.sh:888
+#: myrepo.sh:893
 msgid "deleting %s from list_AUR ..."
 msgstr "正在从list_AUR中删除%s ..."
 
-#: myrepo.sh:896
+#: myrepo.sh:901
 msgid "Unknown command."
 msgstr "未知命令。"
 
-#: myrepo.sh:901
+#: myrepo.sh:906
 msgid "No change of list_AUR, no need to renew pool database %s ..."
 msgstr "list_AUR没有更改，所以pool的数据库%s不需更新。"
 
-#: myrepo.sh:920
+#: myrepo.sh:925
 msgid "There are %s packages in list_AUR:\\n%s"
 msgstr "有%s个软件存在于list_AUR中：\\n%s"
 
-#: myrepo.sh:940
+#: myrepo.sh:945
 msgid "(%s/%s) %s : Ignore."
 msgstr "(%s/%s) %s：忽略。"
 
-#: myrepo.sh:942
+#: myrepo.sh:947
 msgid "(%s/%s) %s : Receiving information from AUR ..."
 msgstr "(%s/%s) %s : 正在从AUR获得相关信息..."
 
-#: myrepo.sh:948
+#: myrepo.sh:953
 msgid "local newest : %s; aur version : %s"
 msgstr "本地最新版本：%s; AUR上的版本：%s"
 
-#: myrepo.sh:952
+#: myrepo.sh:957
 msgid "Need to update"
 msgstr "需要升级"
 
-#: myrepo.sh:954
+#: myrepo.sh:959
 msgid "No need to update"
 msgstr "不需升级"
 
-#: myrepo.sh:957
+#: myrepo.sh:962
 msgid "NotFound"
 msgstr "没找到"
 
-#: myrepo.sh:963
+#: myrepo.sh:968
 msgid "Overview, no package need to update."
 msgstr "概述，没有软件需要升级。"
 
-#: myrepo.sh:965
+#: myrepo.sh:970
 msgid "Overview, %s packages need to update:\\n%s"
 msgstr "概述，%s个软件需要升级：\\n%s"
 
-#: myrepo.sh:977
+#: myrepo.sh:982
 msgid "(%s/%s) Updating package %s(%s=>%s) from AUR"
 msgstr "(%s/%s) 正在从AUR升级软件%s,版本从%s到%s"
 
-#: myrepo.sh:981
+#: myrepo.sh:986
 msgid "Update package %s(%s=>%s) from AUR, done."
 msgstr "从AUR升级软件%s（版本从%s到%s），完毕。"
 
-#: myrepo.sh:988
+#: myrepo.sh:993
 msgid "Finish updating %s packages."
 msgstr "%s个软件升级完成。"
 
-#: myrepo.sh:989
+#: myrepo.sh:994
 msgid "Success: %s\\n%s"
 msgstr "成功：%s个\\n%s"
 
-#: myrepo.sh:990
+#: myrepo.sh:995
 msgid "Fail: %s\\n%s"
 msgstr "失败：%s个\\n%s"
 
-#: myrepo.sh:994
+#: myrepo.sh:999
 msgid "%s packages not found in AUR:\\n%s"
 msgstr "%s个软件没在AUR中找到：\\n%s"
 
-#: myrepo.sh:995
+#: myrepo.sh:1000
 msgid ""
 "These packages may be moved into repo community, or your network cannot "
 "connect to AUR %s."
 msgstr "这些软件可能已被移到community仓库，或者是因为你的网络无法连接到AUR %s."
 
-#: myrepo.sh:1003
+#: myrepo.sh:1008
 msgid "In package names:"
 msgstr "软件名称中："
 
-#: myrepo.sh:1007
+#: myrepo.sh:1012
 msgid "In pkg file names:"
 msgstr "软件包文件名称中："
 
-#: myrepo.sh:1034
+#: myrepo.sh:1039
 msgid "(%s/%s) %s : "
 msgstr "(%s/%s) %s : "
 
-#: myrepo.sh:1036
+#: myrepo.sh:1041
 msgid "Source file : %s(%s, %s)"
 msgstr "源码包文件：%s(%s, %s)"
 
-#: myrepo.sh:1041
+#: myrepo.sh:1046
 msgid "pkg files :\\n%s"
 msgstr "软件包文件：\\n%s"
 
-#: myrepo.sh:1043
+#: myrepo.sh:1048
 msgid "More information :\\n%s"
 msgstr "更多信息：\\n%s"
 
-#: myrepo.sh:1054
+#: myrepo.sh:1059
 msgid "Usage: %s [options]"
 msgstr "用法：%s [选项]"
 
-#: myrepo.sh:1056
+#: myrepo.sh:1061
 msgid "Options:"
 msgstr "选项："
 
-#: myrepo.sh:1057
+#: myrepo.sh:1062
 msgid "  -A, --add <p/srcfile>  add package into repo"
 msgstr "  -A, --add <路径/源码包>  添加软件到软件源中"
 
-#: myrepo.sh:1058
+#: myrepo.sh:1063
 msgid "  -C, --check            check repo, link, signature and so on"
 msgstr "  -C, --check              检查软件源，软件包、链接、签名等"
 
-#: myrepo.sh:1059
+#: myrepo.sh:1064
 msgid "  -E, --editaur          edit 'list_AUR'"
 msgstr "  -E, --editaur            编辑'list_AUR'"
 
-#: myrepo.sh:1060
+#: myrepo.sh:1065
 msgid "  -I, --info             view package information"
 msgstr "  -I, --info               查看软件相关信息"
 
-#: myrepo.sh:1061
+#: myrepo.sh:1066
 msgid "  -R, --remove <pkg>     remove package from repo"
 msgstr "  -R, --remove <软件名>    从软件源中删除软件"
 
-#: myrepo.sh:1062
+#: myrepo.sh:1067
 msgid "  -S, --search <key>     search package in your repo"
 msgstr "  -S, --search <关键字>    在软件源中搜索软件、软件包"
 
-#: myrepo.sh:1063
+#: myrepo.sh:1068
 msgid "  -U, --update           update packages in 'list_AUR' from AUR"
 msgstr "  -U, --update             从AUR升级'list_AUR'中的软件"
 
-#: myrepo.sh:1064
+#: myrepo.sh:1069
 msgid "  -s, --sign <USER-ID>   sign package with USER-ID"
 msgstr "  -s, --sign <USER-ID>     用USER-ID为软件包创建签名"
 
-#: myrepo.sh:1065
+#: myrepo.sh:1070
 msgid "  -v, --verbose          be verbose"
 msgstr "  -v, --verbose            显示详细信息"
 
-#: myrepo.sh:1066
+#: myrepo.sh:1071
 msgid "  -h, --help             print this usage guide"
 msgstr "  -h, --help               显示本帮助信息"
 
-#: myrepo.sh:1067
+#: myrepo.sh:1072
 msgid "  --init                 initialize repo"
 msgstr "  --init                   初始化软件源"
 
-#: myrepo.sh:1068
+#: myrepo.sh:1073
 msgid ""
 "  --ignore <packages>    ignore packages (Format: package1,package2,...)"
 msgstr "  --ignore <软件名>        忽略某些软件 (格式：软件1,软件2,...)"
 
-#: myrepo.sh:1069
+#: myrepo.sh:1074
 msgid ""
 "  --only <packages>      only do with these packages (Format as --ignore)"
 msgstr "  --only <软件名>          仅处理某些软件(格式和 --ignore 一样）"
 
-#: myrepo.sh:1071
+#: myrepo.sh:1076
 msgid ""
 "  --i686 <NEWROOT>       to Build i686 package with directory NEWROOT (need "
 "sudo, arch-chroot)"
@@ -510,46 +510,46 @@ msgstr ""
 "  --i686 <NEWROOT>         Chroot到NEWROOT构建i686软件包(需要sudo, arch-"
 "chroot)"
 
-#: myrepo.sh:1073
+#: myrepo.sh:1078
 msgid "  --nosign               ignore sign package"
 msgstr "  --nosign                 不为软件包创建签名"
 
-#: myrepo.sh:1075
+#: myrepo.sh:1080
 msgid "Notes:"
 msgstr "注意："
 
-#: myrepo.sh:1076
+#: myrepo.sh:1081
 msgid "%s Here, 'package' refers to pkgs per architecture grouped by pkgbase."
 msgstr "%s 这里的软件(package)是指以pkgbase为分组的不同架构下所有的软件包。"
 
-#: myrepo.sh:1077
+#: myrepo.sh:1082
 msgid ""
 "%s With option -A, pkgs you have built must be in the same DIR with srcfile."
 msgstr "%s 选项-A,需要您把自己已创建的软件包与源码包放在同一目录。"
 
-#: myrepo.sh:1078
+#: myrepo.sh:1083
 msgid "%s With option -R, package will be removed into %s."
 msgstr "%s 选项-R，将会把软件删除到%s中。"
 
-#: myrepo.sh:1079 myrepo.sh:1147
+#: myrepo.sh:1084 myrepo.sh:1152
 msgid "%s Option -A or -U, should work with option -s unless --nosign enabled."
 msgstr "%s 选项-A或-U，需要配合选项-s使用，除非指定了--nosign。"
 
-#: myrepo.sh:1080
+#: myrepo.sh:1085
 msgid ""
 "%s Option --ignore or --only, only work with option -C or -U to save your "
 "time."
 msgstr "%s 选项--ignore或--only，仅可以配合-C或-U用来节省时间。"
 
-#: myrepo.sh:1129
+#: myrepo.sh:1134
 msgid " A myrepo is running!"
 msgstr "有一个 myrepo 已在运行！"
 
-#: myrepo.sh:1130
+#: myrepo.sh:1135
 msgid "If you're sure a myrepo is not already running, you can remove %s."
 msgstr "如果你确定没有 myrepo 在运行，你可以删除 %s。"
 
-#: myrepo.sh:1136
+#: myrepo.sh:1141
 msgid ""
 "Some REPO directories or files do not exist. Use '--init' to initialize "
 "repo, or check them by youself!"
@@ -557,10 +557,10 @@ msgstr ""
 "软件源的一些目录或文件不存在。用'--init'初始化软件源，或者先手动检查一下它"
 "们！"
 
-#: myrepo.sh:1142
+#: myrepo.sh:1147
 msgid "At least one operation of '%s', please."
 msgstr "请至少指定‘%s’中的一个操作。"
 
-#: myrepo.sh:1153
+#: myrepo.sh:1158
 msgid "All files in %s will be removed !"
 msgstr "%s中所有的文件将被删除！"

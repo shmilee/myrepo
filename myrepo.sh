@@ -14,7 +14,7 @@
 export TEXTDOMAIN='myrepo'
 export TEXTDOMAINDIR='/usr/share/locale'
 
-MYVER=0.1
+MYVER=0.2
 AURURL="https://aur.archlinux.org"
 INFOURL="$AURURL/rpc.php?type=info"
 source /etc/myrepo.conf
@@ -198,7 +198,7 @@ get_files() {
             files=($(basename -a $(ls $2/$3*$4*src.tar* 2>/dev/null) 2>/dev/null))
             ;;
         -p)
-            files=($(basename -a $(ls $2/$3*$4.pkg.tar* 2>/dev/null) 2>/dev/null|sed '/.*.sig$/d'))
+            files=($(basename -a $(ls $2/$3*$4*pkg.tar* 2>/dev/null) 2>/dev/null|sed '/.*.sig$/d'))
             ;;
         *)
             msg "Unknown option of get_files."
@@ -412,7 +412,7 @@ build_aur_pkg() {
         fi
         # change version for git or svn ...
         cd $TEMP/$name
-        newVer=$(awk '/^pkgver/,sub(/pkgver=/,"",$1){printf $1} /^pkgrel/,sub(/pkgrel=/,"",$1){print "-"$1}' PKGBUILD)
+        newVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1} /^pkgrel=/,sub(/pkgrel=/,"",$1){print "-"$1}' PKGBUILD)
         if [ "$aurVer" != "$newVer" ];then
             echo $newVer > $name-newver #newVersion file
         fi
@@ -459,7 +459,7 @@ info_pool_db() {
             fi
             ;;
         -v)
-            local vers=$(basename -a $(tar --wildcards -tf $POOLDB $2/* 2>/dev/null) 2>/dev/null)
+            local vers=$(basename -a $(tar --wildcards -tf $POOLDB $2/ 2>/dev/null|sed '/\/$/d') 2>/dev/null)
             if [[ x"$vers" == x ]];then
                 return 3
             else
@@ -538,7 +538,7 @@ add_package() {
     # get pkg file names
     local pkg_names=($(read_srcfile -n $1 $name))
     for _na in ${pkg_names[@]}; do
-        pkg_files+=($(get_files -p $srcpath $_na ))
+        pkg_files+=($(get_files -p $srcpath $_na $version))
     done
     if [[ "${#pkg_files[@]}" == "0" ]];then
         error "$(gettext "Package %s has not been built, do it youself please.")" "$name"
@@ -755,7 +755,12 @@ check_repo() {
             done
         else
             # pool
-            msg2 "$(gettext "%s versions(%s) in pool.")" "${#vers[@]}" "${vers[*]}"
+            if [ ${#vers[@]} !=  "1" ];then
+                sta="${RED}${#vers[@]}${ALL_OFF}${BOLD}"
+            else
+                sta="${GREEN}${#vers[@]}${ALL_OFF}${BOLD}"
+            fi
+            msg2 "$(gettext "%s versions(%s) in pool.")" "$sta" "${vers[*]}"
             for ver in ${vers[@]}; do
                 sta=""
                 if [[ ! -f $SRCS/$name-$ver.src.tar.gz ]];then
@@ -949,7 +954,7 @@ update_aur() {
                 fi
                 if [ "$loc_ver" != "$aur_ver" -a "$(get_newest $loc_ver $aur_ver)" == "$aur_ver" ];then
                     up_name+=("${name}::$loc_ver==>$aur_ver")
-                    msg2 "$(gettext "Need to update")"
+                    msg2 "${GREEN}$(gettext "Need to update")"
                 else
                     msg2 "$(gettext "No need to update")"
                 fi
