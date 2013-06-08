@@ -340,18 +340,20 @@ read_srcfile() {
 
 ## makepkg x86_64 i686, sourcefile
 # usage  : dual_makepkg [tarball extract path]
-# return : 0, get srcfile and at least one pkg file
-#          1, get no pkg file, all failed
 dual_makepkg() {
-    local name=$(basename $1) succ=0 ret=1
-
+    local name=$(basename $1)
     cd $1
-    makepkg -sL && succ+=1
-    makepkg --allsource && ret=0
-
+    if ! makepkg -sL; then
+        BUILD_RESULT="No pkg build!"
+        return 1
+    elif ! makepkg --allsource; then
+        BUILD_RESULT="No source file build!"
+        return 2
+    fi
     ls *any.pkg.tar* 2>/dev/null >/dev/null # arch=any?
     #build i686 package in x86_64, when arch != any
-    if [ "$?" != 0 -a "$ret" == 0 -a x"$i686_ROOT" != x ];then
+    if [ "$?" != 0 -a x"$i686_ROOT" != x -a "$(uname -m)" == "x86_64" ];then
+        BUILD_RESULT="$(uname -m) pkg build, "
         msg "$(gettext "Chrooting into %s to Build i686 package.")" "$i686_ROOT" 
         if sudo arch-chroot $i686_ROOT/ linux32 echo -n;then
             [[ -d $i686_ROOT/work ]] || sudo chroot $i686_ROOT/ mkdir /work
@@ -360,10 +362,11 @@ dual_makepkg() {
                 "cd /work/$name; linux32 makepkg -sL -f --asroot && linux32 makepkg -f --allsource --asroot && touch succ"
             # pkg file
             if [ -f $i686_ROOT/work/$name/succ ];then
-                succ+=1
                 cp $i686_ROOT/work/$name/$name-*pkg.tar* $1/
             else
                 msg "$(gettext "Build i686 package .. failed.")"
+                BUILD_RESULT+="i686 pkg failed."
+                return 3
             fi
             # src file
             local srcname=$(ls $name-*src.tar*)
@@ -376,17 +379,14 @@ dual_makepkg() {
                 tar zcf $srcname $name/
                 msg "$(gettext "Done.")"
             fi
+            BUILD_RESULT+="i686 pkg build."
         else
             error "$(gettext "Failed to chroot into %s.")" "$i686_ROOT"
+            BUILD_RESULT+="chroot failed."
+            return 4
         fi
     fi
-
-    cd $TEMP
-    if [ "$succ" != 0 ];then
-        return 0
-    else
-        return 1
-    fi
+    return 0
 }
 
 ## build package $1 from aur in directory($TEMP/PkgName/)
@@ -396,7 +396,7 @@ dual_makepkg() {
 #          if `makepkg` fail, return 1; if tarball broken, return 2
 build_aur_pkg() {
     local name="$1" locVer="$2" aurVer="$3" tarURL="$4"
-    local newVer ret
+    local newVer
 
     # pkgver-pkgrel, if pkgver is same, then no need to download sources again.
     if [ ${locVer%-*} == ${aurVer%-*} ];then
@@ -405,9 +405,10 @@ build_aur_pkg() {
     fi
     # get tarball and extract to $TEMP
     if curl -Lfs $tarURL |tar xfz - -C $TEMP $O_V;then
-        dual_makepkg $TEMP/$name || ret=$?
+        BUILD_RESULT=""
+        dual_makepkg $TEMP/$name
         if [ "$?" != 0 ];then
-            error "$(gettext "Failed to run \`makepkg\`, error code:%s")" $ret
+            error "$(gettext "Failed to run \`makepkg\`: %s")" "$BUILD_RESULT"
             return 1
         fi
         # change version for git or svn ...
@@ -594,12 +595,10 @@ add_package() {
     # add to log
     if [[ "$_UPDATE" == "1" ]];then
         logging -u "$name ($old_version=>$version)"
+    elif [[ "$TOREPO" == "1" ]];then
+        logging -a "$name ($version)"
     else
-        if [[ "$TOREPO" == "1" ]];then
-            logging -a "$name ($version)"
-        else
-            logging -a "$name (old:$version)"
-        fi
+        logging -a "$name (old:$version)"
     fi
     msg "$(gettext "Finish adding package %s to REPO: %s.")" "$name:$version" "$REPO_NAME"
 }
@@ -703,18 +702,13 @@ remove_package() {
         fi
     else
         warning "$(gettext "Package %s do not exist in repo.")" "$name"
-        #mkdir $TEMP/pooldb; tar zxf $POOLDB -C $TEMP/pooldb
-        #if grep -R ^$name $TEMP/pooldb 2>&1 >/dev/null;then
-        #    msg "$(gettext "%s may be a pkg name.")" "$name"
-        #fi
-        #rm -r $TEMP/pooldb
         return 1
     fi
 }
 
 ## check repo, link, signature and so on
 check_repo() {
-    local name i ver vers newest sfile pfile sta _a arch plost=() olost=()
+    local name i ver vers newest sfile pfile sta _a arch gpg_check plost=() olost=()
     local names=($(info_pool_db -n))
     # about ONLY_PKGS
     if [ "${#ONLY_PKGS[@]}" != 0 ];then
@@ -764,22 +758,22 @@ check_repo() {
             for ver in ${vers[@]}; do
                 sta=""
                 if [[ ! -f $SRCS/$name-$ver.src.tar.gz ]];then
-                    sta+="source-lost,"
+                    sta+="source_file_lost,_"
                 else
                     sed -i "/$name-$ver.src.tar.gz/d" $TEMP/check/sourcefiles.list
                 fi
                 for pfile in $(cat $TEMP/pooldb/$name/$ver); do
                     if [[ ! -f $PKGS/$pfile ]];then
-                        sta+="$pfile-lost,"
+                        sta+="${pfile}_lost,_"
                     else
                         if ! gpg --verify $PKGS/$pfile.sig $PKGS/$pfile 2>/dev/null >/dev/null;then
-                            sta+="$pfile.sig-broken,"
+                            sta+="${pfile}.sig_broken,_"
                         fi
                         sed -i "/^$pfile$/d;/^$pfile.sig$/d" $TEMP/check/pkgfiles.list
                     fi
                 done
                 if [[ x"$sta" != x ]];then
-                    plost+=("$name:$ver---${sta}over.")
+                    plost+=("$name:${ver}___${sta}_OVER.")
                 fi
             done
             # os
@@ -790,23 +784,36 @@ check_repo() {
                 arch=${pfile##*-}; arch=${arch%.pkg.tar*}
                 [[ "$arch" == "any" ]] && arch="i686 x86_64"
                 for _a in $arch; do
-                    if [[ ! -f $REPO_PATH/os/$_a/$pfile ]];then
-                        sta+="$pfile(${_a}-ln)-lost,"
+                    gpg_check=0
+                    if [[ ! -L $REPO_PATH/os/$_a/$pfile ]];then
+                        sta+="$pfile(${_a})_link_lost,_"
+                    elif [[ ! -f $REPO_PATH/os/$_a/$pfile ]];then
+                        sta+="$pfile(${_a})_file_lost,_"
                     else
-                        if ! gpg --verify $REPO_PATH/os/$_a/$pfile.sig $REPO_PATH/os/$_a/$pfile 2>/dev/null >/dev/null;then
-                            sta+="$pfile.sig(${_a}-ln)-broken,"
-                        fi
-                        sed -i "/^$pfile$/d;/^$pfile.sig$/d" $TEMP/check/$_a.pkglist
+                        ((gpg_check++))
                     fi
+                    if [[ ! -L $REPO_PATH/os/$_a/${pfile}.sig ]];then
+                        sta+="${pfile}.sig(${_a})_link_lost,_"
+                    elif [[ ! -f $REPO_PATH/os/$_a/${pfile}.sig ]];then
+                        sta+="${pfile}.sig(${_a})_file_lost,_"
+                    else
+                        ((gpg_check++))
+                    fi
+                    if [[ $gpg_check == 2 ]];then
+                        if ! gpg --verify $REPO_PATH/os/$_a/$pfile.sig $REPO_PATH/os/$_a/$pfile 2>/dev/null >/dev/null;then
+                            sta+="$pfile(${_a})_verify_error,_"
+                        fi
+                    fi
+                    sed -i "/^$pfile$/d;/^$pfile.sig$/d" $TEMP/check/$_a.pkglist
                     if grep ^$pfile$ $TEMP/check/$_a.repodb 2>&1 >/dev/null;then
                         sed -i "/$pfile/d" $TEMP/check/$_a.repodb
                     else
-                        sta+="$pfile(${_a}-repodb)-lost,"
+                        sta+="$pfile(${_a})_lost_in_repodb,_"
                     fi
                 done
             done
             if [[ x"$sta" != x ]];then
-                olost+=("$name:$newest--${sta}over.")
+                olost+=("$name:${newest}___${sta}_OVER.")
             fi
             # list_AUR
         fi
@@ -1006,9 +1013,7 @@ search_repo() {
     local key=$1 name
     # first, search package names
     msg "$(gettext "In package names:")"
-    for name in $(info_pool_db -n); do
-        echo $name|grep --color=auto $key
-    done
+    echo $(info_pool_db -n) | sed 's/ /\n/g' | grep --color=auto $key
     msg "$(gettext "In pkg file names:")"
     mkdir $TEMP/pooldb
     if ! tar zxf $POOLDB -C $TEMP/pooldb;then
