@@ -17,47 +17,6 @@ export TEXTDOMAINDIR='/usr/share/locale'
 MYVER=0.2
 AURURL="https://aur.archlinux.org"
 INFOURL="$AURURL/rpc.php?type=info"
-source /etc/myrepo.conf
-
-## REPO TREE
-# $REPO_PATH
-# ├── $REPO_NAME.log
-# ├── os
-# │   ├── i686
-# │   └── x86_64
-# ├── pool
-# │   ├── packages
-# │   ├── pool.db.tar.gz
-# │   └── sources
-# └── trash
-SRCS=$REPO_PATH/pool/sources
-PKGS=$REPO_PATH/pool/packages
-POOLDB=$REPO_PATH/pool/pool.db.tar.gz
-LOG=$REPO_PATH/$REPO_NAME.log
-TRASH=$REPO_PATH/trash
-#AURLIST=$REPO_PATH/pool/pool.db.tar.gz(list_AUR)
-
-## using color
-unset ALL_OFF BOLD BLUE GREEN RED YELLOW
-if [[ $USE_COLOR = "y" ]]; then
-    # prefer terminal safe colored and bold text when tput is supported
-    if tput setaf 0 &>/dev/null; then
-        ALL_OFF="$(tput sgr0)"
-        BOLD="$(tput bold)"
-        BLUE="${BOLD}$(tput setaf 4)"
-        GREEN="${BOLD}$(tput setaf 2)"
-        RED="${BOLD}$(tput setaf 1)"
-        YELLOW="${BOLD}$(tput setaf 3)"
-    else
-        ALL_OFF="\e[1;0m"
-        BOLD="\e[1;1m"
-        BLUE="${BOLD}\e[1;34m"
-        GREEN="${BOLD}\e[1;32m"
-        RED="${BOLD}\e[1;31m"
-        YELLOW="${BOLD}\e[1;33m"
-    fi
-fi
-readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
 
 msg() {
     local mesg=$1; shift
@@ -524,9 +483,24 @@ ln_repo_db() {
     fi
 }
 
+# if SIGN packages, check USER_ID for Gnupg
+check_user_id() {
+    if [ x"$USER_ID" == x ]; then
+        error "$(gettext "Lost 'USER_ID', edit configure file %s.")" "/etc/myrepo.conf"
+        exit 1
+    fi
+    msg "$(gettext "Checking key signatures for '%s' ...")" "$USER_ID"
+    if ! gpg --check-sigs $USER_ID >/dev/null; then
+        exit 1
+    fi
+}
+
 ## add package to repo, $1 = source file
 # usage  : add_package [path/to/source/file]
 add_package() {
+    if [ $SIGN == 1 ];then
+        check_user_id
+    fi
     [[ x"$1" == x ]] && return 1
     echo $1|grep src.tar 2>&1 >/dev/null
     if [ "$?" != "0" -o ! -f $1 ];then
@@ -710,6 +684,9 @@ remove_package() {
 check_repo() {
     local name i ver vers newest sfile pfile sta _a arch gpg_check plost=() olost=()
     local names=($(info_pool_db -n))
+    if [ $SIGN == 1 ];then
+        check_user_id
+    fi
     # about ONLY_PKGS
     if [ "${#ONLY_PKGS[@]}" != 0 ];then
         for name in ${names[@]}; do
@@ -922,6 +899,9 @@ edit_aurlist() {
 update_aur() {
     local names name _up info loc_ver aur_ver tarballURL i
     local up_name=() suc_name=() fal_name=() los_name=()
+    if [ $SIGN == 1 ];then
+        check_user_id
+    fi
     mkdir $TEMP/pooldb
     if ! tar zxf $POOLDB -C $TEMP/pooldb;then
         error "$(gettext "%s may be broken, check it by youself!")" "$POOLDB"
@@ -966,7 +946,7 @@ update_aur() {
                     msg2 "$(gettext "No need to update")"
                 fi
             else
-                msg2 "$(gettext "NotFound")"
+                msg2 "${RED}$(gettext "NotFound")"
                 los_name+=("$name")
             fi
         fi
@@ -1071,23 +1051,23 @@ usage() {
     printf -- "$(gettext "  -R, --remove <pkg>     remove package from repo")\n"
     printf -- "$(gettext "  -S, --search <key>     search package in your repo")\n"
     printf -- "$(gettext "  -U, --update           update packages in 'list_AUR' from AUR")\n"
-    printf -- "$(gettext "  -s, --sign <USER-ID>   sign package with USER-ID")\n"
     printf -- "$(gettext "  -v, --verbose          be verbose")\n"
     printf -- "$(gettext "  -h, --help             print this usage guide")\n"
     printf -- "$(gettext "  --init                 initialize repo")\n"
     printf -- "$(gettext "  --ignore <packages>    ignore packages (Format: package1,package2,...)")\n"
     printf -- "$(gettext "  --only <packages>      only do with these packages (Format as --ignore)")\n"
     if [ "$(uname -m)" == "x86_64" ];then
-        printf -- "$(gettext "  --i686 <NEWROOT>       to Build i686 package with directory NEWROOT (need sudo, arch-chroot)")\n"
+        printf -- "$(gettext "  --i686 <NEWROOT>       Chroot to 'NEWROOT' to build i686 package (need sudo, arch-chroot)")\n"
     fi
-    printf -- "$(gettext "  --nosign               ignore sign package")\n"
     echo
     printf -- "$(gettext "Notes:")\n"
     printf -- "$(gettext "%s Here, 'package' refers to pkgs per architecture grouped by pkgbase.")\n" "1)"
     printf -- "$(gettext "%s With option -A, pkgs you have built must be in the same DIR with srcfile.")\n" "2)"
     printf -- "$(gettext "%s With option -R, package will be removed into %s.")\n" "3)" "$TRASH"
-    printf -- "$(gettext "%s Option -A or -U, should work with option -s unless --nosign enabled.")\n" "4)"
-    printf -- "$(gettext "%s Option --ignore or --only, only work with option -C or -U to save your time.")\n" "5)"
+    printf -- "$(gettext "%s Option --ignore or --only, only work with option -C or -U to save your time.")\n" "4)"
+    if [ "$(uname -m)" == "x86_64" ];then
+        printf -- "$(gettext "%s Ensure the base-devel group is installed in 'NEWROOT' when using option --i686.")\n" "5)"
+    fi
     echo
 }
 
@@ -1095,13 +1075,61 @@ usage() {
 # BEGIN MAIN
 ##
 
+if [ -f /etc/myrepo.conf ]; then
+    source /etc/myrepo.conf
+    if [ x$REPO_PATH == x -o x$REPO_NAME == x -o x$TEMP == x -o x$USE_COLOR == x -o x$SIGN == x ]; then
+        error "$(gettext "Some variables have no value. Edit configure file %s.")" "/etc/myrepo.conf"
+        exit 1
+    fi
+else
+    error "$(gettext "Lost configure file %s !")" "/etc/myrepo.conf"
+    exit 1
+fi
+
+# using color
+unset ALL_OFF BOLD BLUE GREEN RED YELLOW
+if [[ $USE_COLOR = "y" ]]; then
+    # prefer terminal safe colored and bold text when tput is supported
+    if tput setaf 0 &>/dev/null; then
+        ALL_OFF="$(tput sgr0)"
+        BOLD="$(tput bold)"
+        BLUE="${BOLD}$(tput setaf 4)"
+        GREEN="${BOLD}$(tput setaf 2)"
+        RED="${BOLD}$(tput setaf 1)"
+        YELLOW="${BOLD}$(tput setaf 3)"
+    else
+        ALL_OFF="\e[1;0m"
+        BOLD="\e[1;1m"
+        BLUE="${BOLD}\e[1;34m"
+        GREEN="${BOLD}\e[1;32m"
+        RED="${BOLD}\e[1;31m"
+        YELLOW="${BOLD}\e[1;33m"
+    fi
+fi
+readonly ALL_OFF BOLD BLUE GREEN RED YELLOW
+
+## REPO TREE
+# $REPO_PATH
+# ├── $REPO_NAME.log
+# ├── os
+# │   ├── i686
+# │   └── x86_64
+# ├── pool
+# │   ├── packages
+# │   ├── pool.db.tar.gz
+# │   └── sources
+# └── trash
+SRCS=$REPO_PATH/pool/sources
+PKGS=$REPO_PATH/pool/packages
+POOLDB=$REPO_PATH/pool/pool.db.tar.gz
+LOG=$REPO_PATH/$REPO_NAME.log
+TRASH=$REPO_PATH/trash
+#AURLIST=$REPO_PATH/pool/pool.db.tar.gz(list_AUR)
+
 # Options
-AU=0
-SIGN=0
-NOSIGN=0
 O_V="" #option for being verbose
-OPT_SHORT="A:CEhI:R:S:s:Uv"
-OPT_LONG="add:,check,editaur,help,info:,i686:,init,ignore:,only:,remove:,search:,sign:,nosign,update,verbose"
+OPT_SHORT="A:CEhI:R:S:Uv"
+OPT_LONG="add:,check,editaur,help,info:,i686:,init,ignore:,only:,remove:,search:,update,verbose"
 if ! OPT_TEMP="$(getopt -q -o $OPT_SHORT -l $OPT_LONG -- "$@")";then
     usage;exit 1
 fi
@@ -1113,21 +1141,19 @@ IGNORE_PKGS=()
 ONLY_PKGS=()
 while true; do
     case $1 in
-        -A|--add)     shift; SRC_PATH=$1; AU=1; OPER+='A ' ;;
+        -A|--add)     shift; SRC_PATH=$1; OPER+='A ' ;;
         -C|--check)   OPER+='C ' ;;
         -E|--editaur) OPER+='E ' ;;
         -I|--info)    shift; INFO_NAME=$1; OPER+='I ' ;;
         -R|--remove)  shift; PKG_NAME=$1; OPER+='R ' ;;
         -S|--search)  shift; SEARCH_KEY=$1; OPER+='S ' ;;
-        -s|--sign)    shift; USER_ID=$1; SIGN=1 ;;
-        -U|--update)  AU=1; OPER+='U ' ;;
+        -U|--update)  OPER+='U ' ;;
         -v|--verbose) O_V+="-v" ;;
         -h|--help)    usage; exit 0 ;;
         --init)       init_repo; exit 0 ;;
         --ignore)     shift; IGNORE_PKGS+=($(echo $1|sed 's/,/ /g')) ;;
         --only)       shift; ONLY_PKGS+=($(echo $1|sed 's/,/ /g'));;
         --i686)       shift; i686_ROOT=$1 ;;
-        --nosign)     NOSIGN=1 ;;
         --)           OPT_IND=0; shift; break ;;
         *)            usage; exit 1 ;;
     esac
@@ -1152,12 +1178,6 @@ if [[ x"$OPER" == x ]];then
     msg "$(gettext "At least one operation of '%s', please.")" "-A -C -E -I -R -S -U, -h or --init"
     echo; usage; exit 0
 else
-    if [[ "$AU" == 1 ]];then
-        if [[ $(($SIGN+$NOSIGN)) != 1 ]];then
-            error "$(gettext "%s Option -A or -U, should work with option -s unless --nosign enabled.")"
-            exit 3
-        fi
-    fi
     # temp files
     if [[ -d $TEMP ]];then
         warning "$(gettext "All files in %s will be removed !")" $TEMP
