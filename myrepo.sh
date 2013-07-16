@@ -349,7 +349,7 @@ dual_makepkg() {
 }
 
 ## build package $1 from aur in directory($TEMP/PkgName/)
-# usage  : build_aur_pkg [PkgName] [aurVersion] [tarballURL]
+# usage  : build_aur_pkg [PkgName] [localVersion] [aurVersion] [tarballURL]
 # result : get PkgName-ver-rel-arch.pkg.tar.xz PkgName-ver-rel.src.tar.gz
 #          get new git version to file 'PkgName-newver'
 #          if `makepkg` fail, return 1; if tarball broken, return 2
@@ -485,6 +485,9 @@ ln_repo_db() {
 
 # if SIGN packages, check USER_ID for Gnupg
 check_user_id() {
+    if [ $SIGN != 1 ];then
+        return 0
+    fi
     if [ x"$USER_ID" == x ]; then
         error "$(gettext "Lost 'USER_ID', edit configure file %s.")" "/etc/myrepo.conf"
         exit 1
@@ -498,9 +501,6 @@ check_user_id() {
 ## add package to repo, $1 = source file
 # usage  : add_package [path/to/source/file]
 add_package() {
-    if [ $SIGN == 1 ];then
-        check_user_id
-    fi
     [[ x"$1" == x ]] && return 1
     echo $1|grep src.tar 2>&1 >/dev/null
     if [ "$?" != "0" -o ! -f $1 ];then
@@ -540,6 +540,11 @@ add_package() {
     else
         msg "$(gettext "Adding package %s to REPO: %s, with %s pkgs:\n%s")"\
             "$name:$version" "$REPO_NAME" "${#pkg_files[@]}" "$(list 1 1 ${pkg_files[@]})"
+    fi
+    # ADD_VERIFY
+    if [ x$ADD_VERIFY == x0 ];then
+        read -p "==> $(gettext "Press ENTER to continue, any other to skip: ")" SSTTOOPP
+        [[ x"$SSTTOOPP" == x ]] || return 0
     fi
     msg2 "$(gettext "Copying source file %s ...")" "$srcfile"
     cp ${O_V} $srcpath/$srcfile $SRCS
@@ -684,9 +689,6 @@ remove_package() {
 check_repo() {
     local name i ver vers newest sfile pfile sta _a arch gpg_check plost=() olost=()
     local names=($(info_pool_db -n))
-    if [ $SIGN == 1 ];then
-        check_user_id
-    fi
     # about ONLY_PKGS
     if [ "${#ONLY_PKGS[@]}" != 0 ];then
         for name in ${names[@]}; do
@@ -899,9 +901,6 @@ edit_aurlist() {
 update_aur() {
     local names name _up info loc_ver aur_ver tarballURL i
     local up_name=() suc_name=() fal_name=() los_name=()
-    if [ $SIGN == 1 ];then
-        check_user_id
-    fi
     mkdir $TEMP/pooldb
     if ! tar zxf $POOLDB -C $TEMP/pooldb;then
         error "$(gettext "%s may be broken, check it by youself!")" "$POOLDB"
@@ -988,6 +987,60 @@ update_aur() {
     fi
 }
 
+## update git and svn packages
+update_git() {
+    local git_names=($(echo $(info_pool_db -n) | sed 's/ /\n/g' | grep -E '\-git$|\-svn$'))
+    local name suc_name=() pas_name=() i srcfile old_pkgs ver nVer
+    if [ "${#git_names[@]}" == 0 ];then
+        msg "$(gettext "Overview, no git or svn package in repo: %s.")" "$REPO_NAME"
+    else
+        msg "$(gettext "Overview, %s git or svn packages need to update:\n%s")" "${#git_names[@]}" "$(list 1 1 ${git_names[@]})"
+        i=0
+        [[ -d $TEMP/git-svn ]] && rm -r $TEMP/git-svn
+        mkdir $TEMP/git-svn
+        for name in ${git_names[@]}; do
+            ((i++))
+            msg "$(gettext "(%s/%s) %s :")" "$i" "${#git_names[@]}" "$name"
+            ver=""; srcfile=""; old_pkgs=() ## cp old_pkg to make `makepkg fail without option -f`
+            read -p "==> $(gettext "Press ENTER to continue, any other to skip: ")" SSTTOOPP
+            if [ x"$SSTTOOPP" != x ];then
+                pas_name+=($name)
+                continue
+            fi
+            ver=$(get_newest $(info_pool_db -v $name))
+            srcfile=$(get_files -s $SRCS $name "$ver")
+            if tar zx -C $TEMP/git-svn -f $POOLDB $name/$ver;then
+                old_pkgs=($(cat $TEMP/git-svn/$name/$ver | sed "s|^|$PKGS/|g"))
+                # begin
+                tar zx ${O_V} -C $TEMP/git-svn -f $SRCS/$srcfile
+                cp ${O_V} ${old_pkgs[@]} $TEMP/git-svn/$name/
+                # makepkg
+                BUILD_RESULT=""
+                dual_makepkg $TEMP/git-svn/$name/
+                if [ "$?" != 0 ];then
+                    error "$(gettext "Failed to run \`makepkg\`: %s")" "$BUILD_RESULT"
+                    pas_name+=($name)
+                else
+                    # get new version pkg
+                    cd $TEMP/git-svn/$name/
+                    srcfile=$(get_newest $(get_files -s . $name))
+                    nVer=$(get_namver -v $srcfile)
+                    add_package $name-${nVer}.src.tar.gz
+                    msg "$(gettext "Update package %s(%s=>%s) from AUR, done.")" "$name" "$ver" "$nVer"
+                    suc_name+=("$name")
+                fi
+            else
+                error "$(gettext "Ignore.")"
+                pas_name+=($name)
+            fi
+        done
+        msg "$(gettext "Report:")"
+        msg2 "$(gettext "Finish updating %s packages.")" "${#git_names[@]}"
+        msg2 "$(gettext "Success: %s\n%s")" "${#suc_name[@]}" "$(list 1 1 ${suc_name[@]})"
+        msg2 "$(gettext "Pass: %s\n%s")" "${#pas_name[@]}" "$(list 1 1 ${pas_name[@]})"
+    fi
+}
+
 ## search package in repo, packages or pkgs. key = $1
 search_repo() {
     local key=$1 name
@@ -1021,7 +1074,7 @@ info_package() {
         for ver in ${versions[@]}; do
             ((i++)); unset src pkgs
             echo
-            msg "$(gettext "(%s/%s) %s : ")" "$i" "${#versions[@]}" "$name-$ver"
+            msg "$(gettext "(%s/%s) %s :")" "$i" "${#versions[@]}" "$name-$ver"
             src=$(get_files -s $SRCS $name $ver)
             msg2 "$(gettext "Source file : %s(%s, %s)")"\
                 "$src" "$(ls -hl $SRCS/$src|awk '{print $5}')" "$(date +%F-%H:%M -r $SRCS/$src)"
@@ -1056,6 +1109,7 @@ usage() {
     printf -- "$(gettext "  --init                 initialize repo")\n"
     printf -- "$(gettext "  --ignore <packages>    ignore packages (Format: package1,package2,...)")\n"
     printf -- "$(gettext "  --only <packages>      only do with these packages (Format as --ignore)")\n"
+    printf -- "$(gettext "  --git-svn              force update git svn packages with local srcfiles")\n"
     if [ "$(uname -m)" == "x86_64" ];then
         printf -- "$(gettext "  --i686 <NEWROOT>       Chroot to 'NEWROOT' to build i686 package (need sudo, arch-chroot)")\n"
     fi
@@ -1065,8 +1119,9 @@ usage() {
     printf -- "$(gettext "%s With option -A, pkgs you have built must be in the same DIR with srcfile.")\n" "2)"
     printf -- "$(gettext "%s With option -R, package will be removed into %s.")\n" "3)" "$TRASH"
     printf -- "$(gettext "%s Option --ignore or --only, only work with option -C or -U to save your time.")\n" "4)"
+    printf -- "$(gettext "%s Use option --git-svn after -U is a good choice.")\n" "5)"
     if [ "$(uname -m)" == "x86_64" ];then
-        printf -- "$(gettext "%s Ensure the base-devel group is installed in 'NEWROOT' when using option --i686.")\n" "5)"
+        printf -- "$(gettext "%s Ensure the base-devel group is installed in 'NEWROOT' when using option --i686.")\n" "6)"
     fi
     echo
 }
@@ -1129,7 +1184,7 @@ TRASH=$REPO_PATH/trash
 # Options
 O_V="" #option for being verbose
 OPT_SHORT="A:CEhI:R:S:Uv"
-OPT_LONG="add:,check,editaur,help,info:,i686:,init,ignore:,only:,remove:,search:,update,verbose"
+OPT_LONG="add:,check,editaur,git-svn,help,info:,i686:,init,ignore:,only:,remove:,search:,update,verbose"
 if ! OPT_TEMP="$(getopt -q -o $OPT_SHORT -l $OPT_LONG -- "$@")";then
     usage;exit 1
 fi
@@ -1153,6 +1208,7 @@ while true; do
         --init)       init_repo; exit 0 ;;
         --ignore)     shift; IGNORE_PKGS+=($(echo $1|sed 's/,/ /g')) ;;
         --only)       shift; ONLY_PKGS+=($(echo $1|sed 's/,/ /g'));;
+        --git-svn)    OPER+='G ';;
         --i686)       shift; i686_ROOT=$1 ;;
         --)           OPT_IND=0; shift; break ;;
         *)            usage; exit 1 ;;
@@ -1188,18 +1244,24 @@ else
         error "$(gettext "Failed to create %s !")" "$TEMP"
         exit 4
     fi
+    # create lock file
     echo $$ >$TEMP/myrepo.lock
     trap '{ rm $TEMP/myrepo.lock; } 2>/dev/null' EXIT
-    # operations
+    # check_user_id with -A -C -U
+    if echo $OPER|grep -E 'A|C|U|G' >/dev/null;then
+        check_user_id
+    fi
+    # operations, ADD_VERIFY=1, false
     for oper in $OPER; do
         case $oper in
-            A) add_package $SRC_PATH ;;
+            A) ADD_VERIFY=0; add_package $SRC_PATH ;;
             C) check_repo ;;
             E) edit_aurlist ;;
+            G) ADD_VERIFY=0; update_git ;;
             I) info_package $INFO_NAME ;;
             R) remove_package $PKG_NAME ;;
             S) search_repo $SEARCH_KEY ;;
-            U) update_aur ;;
+            U) ADD_VERIFY=1; update_aur ;;
             *) msg "Unknown option." ;;
         esac
     done
