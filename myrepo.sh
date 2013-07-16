@@ -14,7 +14,7 @@
 export TEXTDOMAIN='myrepo'
 export TEXTDOMAINDIR='/usr/share/locale'
 
-MYVER=0.2
+MYVER=0.3
 AURURL="https://aur.archlinux.org"
 INFOURL="$AURURL/rpc.php?type=info"
 
@@ -273,7 +273,7 @@ get_repo_filename() {
 #          -a) get more information
 read_srcfile() {
     mkdir $TEMP/pkgbuild
-    tar zx -C $TEMP/pkgbuild -f $2 $3/PKGBUILD 2>&1 >/dev/null
+    tar --force-local -zx -C $TEMP/pkgbuild -f $2 $3/PKGBUILD 2>&1 >/dev/null
     case $1 in
         -n)
             if grep ^pkgbase $TEMP/pkgbuild/$3/PKGBUILD 2>&1 >/dev/null;then # more than one pkg
@@ -316,7 +316,7 @@ dual_makepkg() {
         msg "$(gettext "Chrooting into %s to Build i686 package.")" "$i686_ROOT" 
         if sudo arch-chroot $i686_ROOT/ linux32 echo -n;then
             [[ -d $i686_ROOT/work ]] || sudo chroot $i686_ROOT/ mkdir /work
-            sudo tar zxf $name-*src.tar* -C $i686_ROOT/work/
+            sudo tar --force-local -zxf $name-*src.tar* -C $i686_ROOT/work/
             sudo arch-chroot $i686_ROOT/ bash -c\
                 "cd /work/$name; linux32 makepkg -sL -f --asroot && linux32 makepkg -f --allsource --asroot && touch succ"
             # pkg file
@@ -329,13 +329,13 @@ dual_makepkg() {
             fi
             # src file
             local srcname=$(ls $name-*src.tar*)
-            tar tf $i686_ROOT/work/$name/$srcname|sort >i686_src_tmp
-            tar tf $srcname|sort >x86_64_src_tmp
+            tar --force-local -tf $i686_ROOT/work/$name/$srcname|sort >i686_src_tmp
+            tar --force-local -tf $srcname|sort >x86_64_src_tmp
             if ! diff i686_src_tmp x86_64_src_tmp 2>&1 >/dev/null;then
                 msg "$(gettext "Merging two different source files ...")"
-                tar zxf $srcname
-                tar zxf $i686_ROOT/work/$name/$srcname
-                tar zcf $srcname $name/
+                tar --force-local -zxf $srcname
+                tar --force-local -zxf $i686_ROOT/work/$name/$srcname
+                tar --force-local -zcf $srcname $name/
                 msg "$(gettext "Done.")"
             fi
             BUILD_RESULT+="i686 pkg build."
@@ -360,7 +360,7 @@ build_aur_pkg() {
     # pkgver-pkgrel, if pkgver is same, then no need to download sources again.
     if [ ${locVer%-*} == ${aurVer%-*} ];then
         [ -f $SRCS/$name-$locVer.src.tar.gz ] && \
-            tar zxf $SRCS/$name-$locVer.src.tar.gz $O_V -C $TEMP 
+            tar --force-local -zxf $SRCS/$name-$locVer.src.tar.gz $O_V -C $TEMP 
     fi
     # get tarball and extract to $TEMP
     if curl -Lfs $tarURL |tar xfz - -C $TEMP $O_V;then
@@ -1012,7 +1012,7 @@ update_git() {
             if tar zx -C $TEMP/git-svn -f $POOLDB $name/$ver;then
                 old_pkgs=($(cat $TEMP/git-svn/$name/$ver | sed "s|^|$PKGS/|g"))
                 # begin
-                tar zx ${O_V} -C $TEMP/git-svn -f $SRCS/$srcfile
+                tar --force-local -zx ${O_V} -C $TEMP/git-svn -f $SRCS/$srcfile
                 cp ${O_V} ${old_pkgs[@]} $TEMP/git-svn/$name/
                 # makepkg
                 BUILD_RESULT=""
