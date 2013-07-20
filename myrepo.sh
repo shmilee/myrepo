@@ -934,7 +934,9 @@ update_aur() {
             [[ "$GET_NEW_INFO" == 0 ]] && get_aur_info -l $name
             if get_aur_info -e $name;then
                 loc_ver=$(get_newest $(info_pool_db -v $name))
+                [ x$loc_ver == x ]&& loc_ver=0
                 aur_ver=$(get_aur_info -v $name)
+                [ x$aur_ver == x ]&& aur_ver=NULL
                 if [ x$O_V != x ];then
                     msg2 "$(gettext "local newest : %s; aur version : %s")" "$loc_ver" "$aur_ver"
                 fi
