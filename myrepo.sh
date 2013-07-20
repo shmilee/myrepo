@@ -316,7 +316,7 @@ dual_makepkg() {
         msg "$(gettext "Chrooting into %s to Build i686 package.")" "$i686_ROOT" 
         if sudo arch-chroot $i686_ROOT/ linux32 echo -n;then
             [[ -d $i686_ROOT/work ]] || sudo chroot $i686_ROOT/ mkdir /work
-            sudo tar --force-local -zxf $name-*src.tar* -C $i686_ROOT/work/
+            sudo tar --force-local -zxf $name-*-*.src.tar* -C $i686_ROOT/work/
             sudo arch-chroot $i686_ROOT/ bash -c\
                 "cd /work/$name; linux32 makepkg -sL -f --asroot && linux32 makepkg -f --allsource --asroot && touch succ"
             # pkg file
@@ -328,7 +328,7 @@ dual_makepkg() {
                 return 3
             fi
             # src file
-            local srcname=$(ls $name-*src.tar*)
+            local srcname=$(ls $name-*-*.src.tar*)
             tar --force-local -tf $i686_ROOT/work/$name/$srcname|sort >i686_src_tmp
             tar --force-local -tf $srcname|sort >x86_64_src_tmp
             if ! diff i686_src_tmp x86_64_src_tmp 2>&1 >/dev/null;then
@@ -372,7 +372,7 @@ build_aur_pkg() {
         fi
         # change version for git or svn ...
         cd $TEMP/$name
-        newVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1} /^pkgrel=/,sub(/pkgrel=/,"",$1){print "-"$1}' PKGBUILD)
+        newVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD)-$(awk '/^pkgrel=/,sub(/pkgrel=/,"",$1){printf $1}' PKGBUILD)
         if [ "$aurVer" != "$newVer" ];then
             echo $newVer > $name-newver #newVersion file
         fi
