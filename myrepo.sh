@@ -14,7 +14,7 @@
 export TEXTDOMAIN='myrepo'
 export TEXTDOMAINDIR='/usr/share/locale'
 
-MYVER=0.3
+MYVER=0.4
 AURURL="https://aur.archlinux.org"
 INFOURL="$AURURL/rpc.php?type=info"
 
@@ -920,7 +920,7 @@ update_aur() {
     # get information and todolist
     GET_NEW_INFO=0
     if [ -d $TEMP/list_info ];then
-        [[ $(date +%Y%d%H) -gt $(date +%Y%d%H -r $TEMP/list_info) ]] && mkdir $TEMP/list_info || GET_NEW_INFO=1
+        [[ $(date +%Y%d%H) -le $(date +%Y%d%H -r $TEMP/list_info) ]] && GET_NEW_INFO=1
     else
         mkdir $TEMP/list_info
     fi
@@ -930,13 +930,18 @@ update_aur() {
         if inclusion $name ${IGNORE_PKGS[@]};then # about IGNORE_PKGS
             msg "$(gettext "(%s/%s) %s : Ignore.")" "$i" "${#names[@]}" "$name"
         else
-            msg "$(gettext "(%s/%s) %s : Receiving information from AUR ...")" "$i" "${#names[@]}" "$name"
-            [[ "$GET_NEW_INFO" == 0 ]] && get_aur_info -l $name
+            if [ "$GET_NEW_INFO" == 1 -a -f $TEMP/list_info/$name ];then
+                msg "$(gettext "(%s/%s) %s : Use recently received information from AUR.")" "$i" "${#names[@]}" "$name"
+            else
+                # 1)no list_info dir, or the dir is old; 2) the dir is new, but no file for pkg '$name'
+                msg "$(gettext "(%s/%s) %s : Receiving information from AUR ...")" "$i" "${#names[@]}" "$name"
+                get_aur_info -l $name
+            fi
             if get_aur_info -e $name;then
                 loc_ver=$(get_newest $(info_pool_db -v $name))
-                [ x$loc_ver == x ]&& loc_ver=0
+                [ x$loc_ver == x ]&& loc_ver=0.0.0
                 aur_ver=$(get_aur_info -v $name)
-                [ x$aur_ver == x ]&& aur_ver=NULL
+                [ x$aur_ver == x ]&& aur_ver=0.0.0
                 if [ x$O_V != x ];then
                     msg2 "$(gettext "local newest : %s; aur version : %s")" "$loc_ver" "$aur_ver"
                 fi
