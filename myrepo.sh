@@ -1099,6 +1099,20 @@ info_package() {
     fi
 }
 
+version() {
+    printf -- "\n\
+ *~.
+ *  '.         myrepo v%s
+ *    \\
+ *     ;       Copyright (c) 2013 shmilee <shmilee.zju@gmail.com>
+=lee===|===+>
+ *     :       $(gettext 'This program may be freely redistributed under')
+ *    /        $(gettext 'the terms of the GNU General Public License.')
+ *  .'
+ *-'
+\n" "$MYVER"
+}
+
 usage() {
     printf "myrepo %s\n" "$MYVER"
     printf -- "$(gettext "Usage: %s [options]")\n" "$(basename $0)"
@@ -1112,11 +1126,12 @@ usage() {
     printf -- "$(gettext "  -S, --search <key>     search package in your repo")\n"
     printf -- "$(gettext "  -U, --update           update packages in 'list_AUR' from AUR")\n"
     printf -- "$(gettext "  -v, --verbose          be verbose")\n"
+    printf -- "$(gettext "  -V, --version          show version information and exit")\n"
     printf -- "$(gettext "  -h, --help             print this usage guide")\n"
     printf -- "$(gettext "  --init                 initialize repo")\n"
     printf -- "$(gettext "  --ignore <packages>    ignore packages (Format: package1,package2,...)")\n"
     printf -- "$(gettext "  --only <packages>      only do with these packages (Format as --ignore)")\n"
-    printf -- "$(gettext "  --git-svn              force update git svn packages with local srcfiles")\n"
+    printf -- "$(gettext "  --git                  force update git svn packages with local srcfiles")\n"
     if [ "$(uname -m)" == "x86_64" ];then
         printf -- "$(gettext "  --i686 <NEWROOT>       Chroot to 'NEWROOT' to build i686 package (need sudo, arch-chroot)")\n"
     fi
@@ -1190,8 +1205,8 @@ TRASH=$REPO_PATH/trash
 
 # Options
 O_V="" #option for being verbose
-OPT_SHORT="A:CEhI:R:S:Uv"
-OPT_LONG="add:,check,editaur,git-svn,help,info:,i686:,init,ignore:,only:,remove:,search:,update,verbose"
+OPT_SHORT="A:CEhI:R:S:UVv"
+OPT_LONG="add:,check,editaur,git,help,info:,i686:,init,ignore:,only:,remove:,search:,update,verbose,version"
 if ! OPT_TEMP="$(getopt -q -o $OPT_SHORT -l $OPT_LONG -- "$@")";then
     usage;exit 1
 fi
@@ -1211,11 +1226,12 @@ while true; do
         -S|--search)  shift; SEARCH_KEY=$1; OPER+='S ' ;;
         -U|--update)  OPER+='U ' ;;
         -v|--verbose) O_V+="-v" ;;
+        -V|--version) version; exit 0 ;;
         -h|--help)    usage; exit 0 ;;
         --init)       init_repo; exit 0 ;;
         --ignore)     shift; IGNORE_PKGS+=($(echo $1|sed 's/,/ /g')) ;;
         --only)       shift; ONLY_PKGS+=($(echo $1|sed 's/,/ /g'));;
-        --git-svn)    OPER+='G ';;
+        --git)        OPER+='G ';;
         --i686)       shift; i686_ROOT=$1 ;;
         --)           OPT_IND=0; shift; break ;;
         *)            usage; exit 1 ;;
@@ -1238,7 +1254,7 @@ fi
 
 if [[ x"$OPER" == x ]];then
     echo
-    msg "$(gettext "At least one operation of '%s', please.")" "-A -C -E -I -R -S -U, -h or --init"
+    msg "$(gettext "At least one operation of '%s', please.")" "-A -C -E -I -R -S -U --git, -h or --init"
     echo; usage; exit 0
 else
     # temp files

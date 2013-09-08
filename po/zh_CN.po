@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: myrepo 0.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-08-30 23:41+0800\n"
+"POT-Creation-Date: 2013-09-08 12:53+0800\n"
 "PO-Revision-Date: 2013-03-12 17:24+0800\n"
 "Last-Translator: shmilee <shmilee.zju@gmail.com>\n"
 "Language-Team: Chinese (simplified) <shmilee.zju@gmail.com>\n"
@@ -351,6 +351,12 @@ msgstr "软件包文件：\\n%s"
 msgid "More information :\\n%s"
 msgstr "更多信息：\\n%s"
 
+msgid "This program may be freely redistributed under"
+msgstr "在GNU一般公众许可条款下"
+
+msgid "the terms of the GNU General Public License."
+msgstr "本程序可以自由分发"
+
 msgid "Usage: %s [options]"
 msgstr "用法：%s [选项]"
 
@@ -381,6 +387,9 @@ msgstr "  -U, --update             从AUR升级'list_AUR'中的软件"
 msgid "  -v, --verbose          be verbose"
 msgstr "  -v, --verbose            显示详细信息"
 
+msgid "  -V, --version          show version information and exit"
+msgstr "  -V, --version            显示版本信息并退出"
+
 msgid "  -h, --help             print this usage guide"
 msgstr "  -h, --help               显示本帮助信息"
 
@@ -396,8 +405,8 @@ msgid ""
 msgstr "  --only <软件名>          仅处理某些软件(格式和 --ignore 一样）"
 
 msgid ""
-"  --git-svn              force update git svn packages with local srcfiles"
-msgstr "  --git-svn                根据本地源码包强制更新 -git -svn 类的软件"
+"  --git                  force update git svn packages with local srcfiles"
+msgstr "  --git                    根据本地源码包强制更新 -git -svn 类的软件"
 
 msgid ""
 "  --i686 <NEWROOT>       Chroot to 'NEWROOT' to build i686 package (need "
