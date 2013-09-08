@@ -18,7 +18,7 @@ MYVER=0.4
 AURURL="https://aur.archlinux.org"
 INFOURL="$AURURL/rpc.php?type=info"
 
-msg() {
+msg() { #{{{
     local mesg=$1; shift
     printf "${GREEN}==>${ALL_OFF}${BOLD} ${mesg}${ALL_OFF}\n" "$@" >&2
 }
@@ -52,8 +52,8 @@ logging() {
 ## list "${@:3}", $1 beginning number, $2 the number of items in a row
 # usage  : list  9 3 a b c d r f g
 # return : 09) a;	10) b;	11) c;	
-#	       12) d;	13) r;	14) f;	
-#	       15) g;
+#          12) d;	13) r;	14) f;	
+#          15) g;
 list() {
     local n=($(seq -w $1 $((${#@}+$1-3)))) i=0 _f
     for _f in ${@:3}; do
@@ -63,11 +63,11 @@ list() {
         ((i++))
     done
     (($i%$2==0)) ||echo # aliquant \n
-}
+} #}}}
 
 ## check REPO directories and files exist or not
 # return 1, when any file or directory not exist
-check_dir() {
+check_dir() { #{{{
     local dir re=0 lost=() lost_file=()
     for dir in $REPO_PATH/{os/{i686,x86_64},pool/{packages,sources},trash}; do
         [[ -d $dir ]] || lost+=($dir)
@@ -83,10 +83,10 @@ check_dir() {
         re=1
     fi
     return $re
-}
+} #}}}
 
 ## initialize REPO directories and files
-init_repo() {
+init_repo() { #{{{
     local YESRM=no
     if [[ x"$REPO_NAME" == x ]];then
         error "$(gettext "A name for the repository is needed.")"
@@ -112,12 +112,12 @@ init_repo() {
         exit 4
     fi
     msg "$(gettext "Finish initializing repository %s.")" "$REPO_NAME"
-}
+} #}}}
 
 ## get version or pkg name from file name, such as pkg-name-ver-rel{-arch.pkg,.src}.tar.gz
 # usage  : get_namver [-v|-n] [FileName]
 # return : ver-rel, pkg-name
-get_namver() {
+get_namver() { #{{{
     local act=$1 file=$2
     local name ver rel
 
@@ -143,13 +143,13 @@ get_namver() {
             msg "Unknown option of get_namver."
             ;;
     esac
-}
+} #}}}
 
 ## get the string of package files or source files in $2 named $3, -p need $4 optionally
 #  usage  : get_files [-s|-p] [path/to/directory] [PkgName] [Version|ARCH]
 #  return : -s) PkgName-1.0-1.src.tar.gz PkgName-2.0-2.src.tar.gz ...
 #           -p) PkgName-1.0-3-x86_64.pkg.tar.xz PkgName-2.0-1-x86_64.pkg.tar.xz ...
-get_files() {
+get_files() { #{{{
     local _s files
     case $1 in
         -s)
@@ -166,13 +166,13 @@ get_files() {
     for _s in ${files[@]}; do
         [[ "$(get_namver -n $_s)" == "$3" ]] && echo -n $_s" "
     done
-}
+} #}}}
 
 ## get newest version, $@ = list of files or versions
 # usage  : get_newest [PkgName-1.0-1.src.tar.gz PkgName-2.0-2.src.tar.gz]...
 #          get_newest [1.0-1 2.0-2]...
 # return : PkgName-2.0-2.src.tar.gz or 2.0-2
-get_newest() {
+get_newest() { #{{{
     if [[ ${#@} == 1 ]];then
         echo $1
     else
@@ -192,7 +192,7 @@ inclusion() {
         fi
     done
     return 1
-}
+} #}}}
 
 ## get the information of package named $2 from aur, write it in file $TEMP/list_info/$2
 # usage  : get_aur_info [-l|-e|-v|-p|-m] [foo]
@@ -201,7 +201,7 @@ inclusion() {
 #          -v) get version(ver-rel) from the file
 #          -p) get tarball download URL
 #          -m) get maintainer
-get_aur_info() {
+get_aur_info() { #{{{
     case $1 in
         -l)
             local aur_pkg_info=$(curl -LfGs --data-urlencode arg="$2" "$INFOURL")
@@ -217,10 +217,14 @@ get_aur_info() {
             fi
             ;;
         -e)
-            if [ "$(cat $TEMP/list_info/$2 2>/dev/null)" == 0 ];then
-                return 1
+            if [ -f $TEMP/list_info/$2 ];then
+                if [ "$(cat $TEMP/list_info/$2 2>/dev/null)" == 0 ];then
+                    return 1
+                else
+                    return 0
+                fi
             else
-                return 0
+                return 2
             fi
             ;;
         -v) awk 'NR==1 {print $1}' $TEMP/list_info/$2 2>/dev/null ;;
@@ -231,13 +235,13 @@ get_aur_info() {
             return 1
             ;;
     esac
-}
+} #}}}
 
 ## get package information form repo db file
 # usage  : get_repo_filename [ARCH] [PkgName]
 # return : filename
 # if PkgName not given, return all the filenames; if package not found in repo-db, return 0
-get_repo_filename() {
+get_repo_filename() { #{{{
     local name=$2
     local _arch=$1
     local db_path=$REPO_PATH/os/$_arch/$REPO_NAME.db.tar.gz
@@ -265,13 +269,13 @@ get_repo_filename() {
         find $TEMP/$_arch -type f -exec awk 'NR==2 {print $1}' {} \;
         rm -r $TEMP/$_arch
     fi
-}
+} #}}}
 
 ## read the PKGBUILD in source file
 # usage  : read_srcfile [-n|-a] [path/to/srcfile] [package-name]
 # return : -n) get pkg names
 #          -a) get more information
-read_srcfile() {
+read_srcfile() { #{{{
     mkdir $TEMP/pkgbuild
     tar --force-local -zx -C $TEMP/pkgbuild -f $2 $3/PKGBUILD 2>&1 >/dev/null
     case $1 in
@@ -295,11 +299,11 @@ read_srcfile() {
             ;;
     esac
     rm -r $TEMP/pkgbuild
-}
+} #}}}
 
 ## makepkg x86_64 i686, sourcefile
 # usage  : dual_makepkg [tarball extract path]
-dual_makepkg() {
+dual_makepkg() { #{{{
     local name=$(basename $1)
     cd $1
     if ! makepkg -sL; then
@@ -382,10 +386,10 @@ build_aur_pkg() {
         error "$(gettext "Tarball of %s is broken.")" "$name:$aurVer"
         return 2
     fi
-}
+} #}}}
 
 ## do this after changing files in $TEMP/pooldb
-retar_pooldb() {
+retar_pooldb() { #{{{
     mv $POOLDB $POOLDB.old
     cd $TEMP/pooldb
     if tar zcf $POOLDB * ;then
@@ -394,14 +398,14 @@ retar_pooldb() {
         error "$(gettext "Renew pool database failed.")"
         cp $POOLDB.old $POOLDB
     fi
-}
+} #}}}
 
 ## get information from $POOLDB
 # usage  : info_pool_db [-e PackageName|PackageName/version] [-n] [-v PackageName]
 # return : -e) PackageName or PackageName/version exist(0) or not(1)
 #          -n) list all names in pool, if null, return 2
 #          -v) list all versions of PackageName, if not exist, return 3
-info_pool_db() {
+info_pool_db() { #{{{
     case $1 in
         -e)
             if tar tf $POOLDB $2 2>/dev/null >/dev/null;then
@@ -481,10 +485,10 @@ ln_repo_db() {
     else
         msg "Unknown option of ln_repo_db."
     fi
-}
+} #}}}
 
 # if SIGN packages, check USER_ID for Gnupg
-check_user_id() {
+check_user_id() { #{{{
     if [ $SIGN != 1 ];then
         return 0
     fi
@@ -496,11 +500,11 @@ check_user_id() {
     if ! gpg --check-sigs $USER_ID >/dev/null; then
         exit 1
     fi
-}
+} #}}}
 
 ## add package to repo, $1 = source file
 # usage  : add_package [path/to/source/file]
-add_package() {
+add_package() { #{{{
     [[ x"$1" == x ]] && return 1
     echo $1|grep src.tar 2>&1 >/dev/null
     if [ "$?" != "0" -o ! -f $1 ];then
@@ -580,12 +584,12 @@ add_package() {
         logging -a "$name (old:$version)"
     fi
     msg "$(gettext "Finish adding package %s to REPO: %s.")" "$name:$version" "$REPO_NAME"
-}
+} #}}}
 
 ## remove package from REPO, $1 = package name
 # usage  : remove_package [Package-Name]
 # mv srcfile and pkgfiles into $TRASH/$PackageName-$version-$(date +%Y%m%d-%H%M%S)
-remove_package() {
+remove_package() { #{{{
     local name=$1
     local versions rmones=() leftones=() select
     local i ver _pf newest trash_dir
@@ -683,10 +687,10 @@ remove_package() {
         warning "$(gettext "Package %s do not exist in repo.")" "$name"
         return 1
     fi
-}
+} #}}}
 
 ## check repo, link, signature and so on
-check_repo() {
+check_repo() { #{{{
     local name i ver vers newest sfile pfile sta _a arch gpg_check plost=() olost=()
     local names=($(info_pool_db -n))
     # about ONLY_PKGS
@@ -831,10 +835,10 @@ check_repo() {
         msg2 "$(gettext "None.")"
     fi
     #msg "$(gettext "%s In %s")" "4)" "list_AUR"
-}
+} #}}}
 
 ## edit list_AUR
-edit_aurlist() {
+edit_aurlist() { #{{{
     local name names ins outs=() comm todo
     mkdir $TEMP/pooldb
     if ! tar zxf $POOLDB -C $TEMP/pooldb;then
@@ -895,10 +899,10 @@ edit_aurlist() {
         retar_pooldb
         msg "$(gettext "Done.")"
     fi
-}
+} #}}}
 
 ## update packages in 'list_AUR' from AUR
-update_aur() {
+update_aur() { #{{{
     local names name _up info loc_ver aur_ver tarballURL i
     local up_name=() suc_name=() fal_name=() los_name=()
     mkdir $TEMP/pooldb
@@ -937,7 +941,8 @@ update_aur() {
                 msg "$(gettext "(%s/%s) %s : Receiving information from AUR ...")" "$i" "${#names[@]}" "$name"
                 get_aur_info -l $name
             fi
-            if get_aur_info -e $name;then
+            get_aur_info -e $name; info=$?  ## 0:exist; 1: not exist; 2: net error
+            if [ $info == 0 ];then
                 loc_ver=$(get_newest $(info_pool_db -v $name))
                 [ x$loc_ver == x ]&& loc_ver=0.0.0
                 aur_ver=$(get_aur_info -v $name)
@@ -951,7 +956,7 @@ update_aur() {
                 else
                     msg2 "$(gettext "No need to update")"
                 fi
-            else
+            elif [ $info == 1 ];then
                 msg2 "${RED}$(gettext "NotFound")"
                 los_name+=("$name")
             fi
@@ -992,10 +997,10 @@ update_aur() {
         msg "$(gettext "%s packages not found in AUR:\n%s")" "${#los_name[@]}" "$(list 1 1 ${los_name[@]})"
         msg "$(gettext "These packages may be moved into repo community, or your network cannot connect to AUR %s.")" "$AURURL"
     fi
-}
+} #}}}
 
 ## update git and svn packages
-update_git() {
+update_git() { #{{{
     local git_names=($(echo $(info_pool_db -n) | sed 's/ /\n/g' | grep -E '\-git$|\-svn$'))
     local name suc_name=() pas_name=() i srcfile old_pkgs ver nVer
     if [ "${#git_names[@]}" == 0 ];then
@@ -1046,10 +1051,10 @@ update_git() {
         msg2 "$(gettext "Success: %s\n%s")" "${#suc_name[@]}" "$(list 1 1 ${suc_name[@]})"
         msg2 "$(gettext "Pass: %s\n%s")" "${#pas_name[@]}" "$(list 1 1 ${pas_name[@]})"
     fi
-}
+} #}}}
 
 ## search package in repo, packages or pkgs. key = $1
-search_repo() {
+search_repo() { #{{{
     local key=$1 name
     # first, search package names
     msg "$(gettext "In package names:")"
@@ -1064,10 +1069,10 @@ search_repo() {
     rm list_AUR
     grep -R --color=auto $key
     msg "$(gettext "Done.")"
-}
+} #}}}
 
 ## get the information of package named $1. name = $1
-info_package() {
+info_package() { #{{{
     local name=$1 versions ver src pkg pkgs i=0
     if info_pool_db -e $name;then
         versions=($(info_pool_db -v $name))
@@ -1097,9 +1102,9 @@ info_package() {
     else
         msg "$(gettext "Package %s do not exist in repo.")" "$name"
     fi
-}
+} #}}}
 
-version() {
+version() { #{{{
     printf -- "\n\
  *~.
  *  '.         myrepo v%s
@@ -1111,9 +1116,9 @@ version() {
  *  .'
  *-'
 \n" "$MYVER"
-}
+} #}}}
 
-usage() {
+usage() { #{{{
     printf "myrepo %s\n" "$MYVER"
     printf -- "$(gettext "Usage: %s [options]")\n" "$(basename $0)"
 	echo
@@ -1146,7 +1151,7 @@ usage() {
         printf -- "$(gettext "%s Ensure the base-devel group is installed in 'NEWROOT' when using option --i686.")\n" "6)"
     fi
     echo
-}
+} #}}}
 
 ##
 # BEGIN MAIN
