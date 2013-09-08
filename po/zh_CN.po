@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: myrepo 0.4\n"
+"Project-Id-Version: myrepo 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-08 12:53+0800\n"
+"POT-Creation-Date: 2013-09-08 15:10+0800\n"
 "PO-Revision-Date: 2013-03-12 17:24+0800\n"
 "Last-Translator: shmilee <shmilee.zju@gmail.com>\n"
 "Language-Team: Chinese (simplified) <shmilee.zju@gmail.com>\n"
@@ -274,11 +274,16 @@ msgstr "list_AUR没有更改，所以pool的数据库%s不需更新。"
 msgid "There are %s packages in list_AUR:\\n%s"
 msgstr "有%s个软件存在于list_AUR中：\\n%s"
 
+msgid ""
+"We will begin to get information of these packages from AUR in 3 seconds."
+msgstr ""
+"3秒后开始从AUR获取这些软件的信息。"
+
 msgid "(%s/%s) %s : Ignore."
 msgstr "(%s/%s) %s：忽略。"
 
-msgid "(%s/%s) %s : Use recently received information from AUR."
-msgstr "(%s/%s) %s : 使用最近从AUR获得的信息。"
+msgid "(%s/%s) %s : Use just received information from AUR."
+msgstr "(%s/%s) %s : 使用刚才从AUR获得的信息。"
 
 msgid "(%s/%s) %s : Receiving information from AUR ..."
 msgstr "(%s/%s) %s : 正在从AUR获得相关信息..."
@@ -383,6 +388,9 @@ msgstr "  -S, --search <关键字>    在软件源中搜索软件、软件包"
 
 msgid "  -U, --update           update packages in 'list_AUR' from AUR"
 msgstr "  -U, --update             从AUR升级'list_AUR'中的软件"
+
+msgid "  -m, --multi            get AUR information with multi threads"
+msgstr "  -m, --multi              多线程从AUR获取信息"
 
 msgid "  -v, --verbose          be verbose"
 msgstr "  -v, --verbose            显示详细信息"

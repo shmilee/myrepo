@@ -29,6 +29,8 @@ package() {
     cd "$srcdir/$_gitname"
     install -Dm644 myrepo.conf "$pkgdir"/etc/myrepo.conf
     install -Dm755 myrepo.sh "$pkgdir"/usr/bin/myrepo
+    install -Dm755 multi-dl.py "$pkgdir"/usr/lib/myrepo/multi-dl.py
+    install -Dm755 get_aur_info.sh "$pkgdir"/usr/lib/myrepo/get_aur_info.sh
     cd po
     for lan in *.mo; do
         install -Dm644 $lan "$pkgdir"/usr/share/locale/${lan%.mo}/LC_MESSAGES/myrepo.mo

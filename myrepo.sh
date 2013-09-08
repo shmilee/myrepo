@@ -14,7 +14,9 @@
 export TEXTDOMAIN='myrepo'
 export TEXTDOMAINDIR='/usr/share/locale'
 
-MYVER=0.4
+MYVER=0.5
+CONF_FILE=/etc/myrepo.conf
+LIBPATH=/usr/lib/myrepo
 AURURL="https://aur.archlinux.org"
 INFOURL="$AURURL/rpc.php?type=info"
 
@@ -493,7 +495,7 @@ check_user_id() { #{{{
         return 0
     fi
     if [ x"$USER_ID" == x ]; then
-        error "$(gettext "Lost 'USER_ID', edit configure file %s.")" "/etc/myrepo.conf"
+        error "$(gettext "Lost 'USER_ID', edit configure file %s.")" "$CONF_FILE"
         exit 1
     fi
     msg "$(gettext "Checking key signatures for '%s' ...")" "$USER_ID"
@@ -928,6 +930,18 @@ update_aur() { #{{{
     else
         mkdir $TEMP/list_info
     fi
+    # multi get AUR information
+    if [ x$O_M == xY ];then
+        GET_NEW_INFO=1
+        if [[ ${#names[@]} -gt 20 ]];then
+            i=20
+        else
+            i=${#names[@]}
+        fi
+        msg "$(gettext "We will begin to get information of these packages from AUR in 3 seconds.")"
+        sleep 3s
+        $LIBPATH/multi-dl.py -c "$LIBPATH/get_aur_info.sh %u" -u ${names[@]} -s -e -t $i
+    fi
     i=0
     for name in ${names[@]}; do
         ((i++))
@@ -935,9 +949,9 @@ update_aur() { #{{{
             msg "$(gettext "(%s/%s) %s : Ignore.")" "$i" "${#names[@]}" "$name"
         else
             if [ "$GET_NEW_INFO" == 1 -a -f $TEMP/list_info/$name ];then
-                msg "$(gettext "(%s/%s) %s : Use recently received information from AUR.")" "$i" "${#names[@]}" "$name"
+                msg "$(gettext "(%s/%s) %s : Use just received information from AUR.")" "$i" "${#names[@]}" "$name"
             else
-                # 1)no list_info dir, or the dir is old; 2) the dir is new, but no file for pkg '$name'
+                # 1)no list_info dir, or the dir is old; 2) the dir is new, but no file for pkg '$name'; 3) multi get failed
                 msg "$(gettext "(%s/%s) %s : Receiving information from AUR ...")" "$i" "${#names[@]}" "$name"
                 get_aur_info -l $name
             fi
@@ -1130,6 +1144,7 @@ usage() { #{{{
     printf -- "$(gettext "  -R, --remove <pkg>     remove package from repo")\n"
     printf -- "$(gettext "  -S, --search <key>     search package in your repo")\n"
     printf -- "$(gettext "  -U, --update           update packages in 'list_AUR' from AUR")\n"
+    printf -- "$(gettext "  -m, --multi            get AUR information with multi threads")\n"
     printf -- "$(gettext "  -v, --verbose          be verbose")\n"
     printf -- "$(gettext "  -V, --version          show version information and exit")\n"
     printf -- "$(gettext "  -h, --help             print this usage guide")\n"
@@ -1157,14 +1172,14 @@ usage() { #{{{
 # BEGIN MAIN
 ##
 
-if [ -f /etc/myrepo.conf ]; then
-    source /etc/myrepo.conf
+if [ -f $CONF_FILE ]; then
+    source $CONF_FILE
     if [ x$REPO_PATH == x -o x$REPO_NAME == x -o x$TEMP == x -o x$USE_COLOR == x -o x$SIGN == x ]; then
-        error "$(gettext "Some variables have no value. Edit configure file %s.")" "/etc/myrepo.conf"
+        error "$(gettext "Some variables have no value. Edit configure file %s.")" "$CONF_FILE"
         exit 1
     fi
 else
-    error "$(gettext "Lost configure file %s !")" "/etc/myrepo.conf"
+    error "$(gettext "Lost configure file %s !")" "$CONF_FILE"
     exit 1
 fi
 
@@ -1210,8 +1225,9 @@ TRASH=$REPO_PATH/trash
 
 # Options
 O_V="" #option for being verbose
-OPT_SHORT="A:CEhI:R:S:UVv"
-OPT_LONG="add:,check,editaur,git,help,info:,i686:,init,ignore:,only:,remove:,search:,update,verbose,version"
+O_M="N" # multi threads
+OPT_SHORT="A:CEhI:mR:S:UVv"
+OPT_LONG="add:,check,editaur,git,help,info:,i686:,init,ignore:,multi,only:,remove:,search:,update,verbose,version"
 if ! OPT_TEMP="$(getopt -q -o $OPT_SHORT -l $OPT_LONG -- "$@")";then
     usage;exit 1
 fi
@@ -1231,6 +1247,7 @@ while true; do
         -S|--search)  shift; SEARCH_KEY=$1; OPER+='S ' ;;
         -U|--update)  OPER+='U ' ;;
         -v|--verbose) O_V+="-v" ;;
+        -m|--multi)   O_M="Y" ;;
         -V|--version) version; exit 0 ;;
         -h|--help)    usage; exit 0 ;;
         --init)       init_repo; exit 0 ;;
