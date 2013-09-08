@@ -1149,6 +1149,7 @@ usage() { #{{{
     printf -- "$(gettext "  -V, --version          show version information and exit")\n"
     printf -- "$(gettext "  -h, --help             print this usage guide")\n"
     printf -- "$(gettext "  --init                 initialize repo")\n"
+    printf -- "$(gettext "  --clean                clean up temporary files in %s")\n" "$TEMP"
     printf -- "$(gettext "  --ignore <packages>    ignore packages (Format: package1,package2,...)")\n"
     printf -- "$(gettext "  --only <packages>      only do with these packages (Format as --ignore)")\n"
     printf -- "$(gettext "  --git                  force update git svn packages with local srcfiles")\n"
@@ -1227,7 +1228,7 @@ TRASH=$REPO_PATH/trash
 O_V="" #option for being verbose
 O_M="N" # multi threads
 OPT_SHORT="A:CEhI:mR:S:UVv"
-OPT_LONG="add:,check,editaur,git,help,info:,i686:,init,ignore:,multi,only:,remove:,search:,update,verbose,version"
+OPT_LONG="add:,check,clean,editaur,git,help,info:,i686:,init,ignore:,multi,only:,remove:,search:,update,verbose,version"
 if ! OPT_TEMP="$(getopt -q -o $OPT_SHORT -l $OPT_LONG -- "$@")";then
     usage;exit 1
 fi
@@ -1251,6 +1252,7 @@ while true; do
         -V|--version) version; exit 0 ;;
         -h|--help)    usage; exit 0 ;;
         --init)       init_repo; exit 0 ;;
+        --clean)      rm -I -rv $TEMP; exit 0 ;;
         --ignore)     shift; IGNORE_PKGS+=($(echo $1|sed 's/,/ /g')) ;;
         --only)       shift; ONLY_PKGS+=($(echo $1|sed 's/,/ /g'));;
         --git)        OPER+='G ';;
@@ -1276,7 +1278,7 @@ fi
 
 if [[ x"$OPER" == x ]];then
     echo
-    msg "$(gettext "At least one operation of '%s', please.")" "-A -C -E -I -R -S -U --git, -h or --init"
+    msg "$(gettext "At least one operation of '%s', please.")" "-A -C -E -I -R -S -U --git, -h --clean or --init"
     echo; usage; exit 0
 else
     # temp files

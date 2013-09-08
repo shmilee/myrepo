@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: myrepo 0.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-08 15:10+0800\n"
+"POT-Creation-Date: 2013-09-08 15:54+0800\n"
 "PO-Revision-Date: 2013-03-12 17:24+0800\n"
 "Last-Translator: shmilee <shmilee.zju@gmail.com>\n"
 "Language-Team: Chinese (simplified) <shmilee.zju@gmail.com>\n"
@@ -276,8 +276,7 @@ msgstr "有%s个软件存在于list_AUR中：\\n%s"
 
 msgid ""
 "We will begin to get information of these packages from AUR in 3 seconds."
-msgstr ""
-"3秒后开始从AUR获取这些软件的信息。"
+msgstr "3秒后开始从AUR获取这些软件的信息。"
 
 msgid "(%s/%s) %s : Ignore."
 msgstr "(%s/%s) %s：忽略。"
@@ -403,6 +402,9 @@ msgstr "  -h, --help               显示本帮助信息"
 
 msgid "  --init                 initialize repo"
 msgstr "  --init                   初始化软件源"
+
+msgid "  --clean                clean up temporary files in %s"
+msgstr "  --clean                  清理 %s 中的临时文件"
 
 msgid ""
 "  --ignore <packages>    ignore packages (Format: package1,package2,...)"
