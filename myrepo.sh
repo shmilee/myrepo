@@ -14,7 +14,7 @@
 export TEXTDOMAIN='myrepo'
 export TEXTDOMAINDIR='/usr/share/locale'
 
-MYVER=0.5
+MYVER=0.6
 CONF_FILE=/etc/myrepo.conf
 LIBPATH=/usr/lib/myrepo
 AURURL="https://aur.archlinux.org"
@@ -1119,17 +1119,13 @@ info_package() { #{{{
 } #}}}
 
 version() { #{{{
-    printf -- "\n\
- *~.
- *  '.         myrepo v%s
- *    \\
- *     ;       Copyright (c) 2013 shmilee <shmilee.zju@gmail.com>
-=lee===|===+>
- *     :       $(gettext 'This program may be freely redistributed under')
- *    /        $(gettext 'the terms of the GNU General Public License.')
- *  .'
- *-'
-\n" "$MYVER"
+    # cat arrow|gzip|base64 
+    printf -- "\n$(echo -e "H4sIABkXNFIAA1PQqtPjUtBSUFDXU4CB3Mqi1IJ8hTLVYrCMgkIMlFawhqpwzi+oLMpMzyhR0EjW\n\
+    VACqs81JTbW1ta0BYm07mGorqGq4OfoKqCJ66kBKV50LADkEIH6FAAAA"|openssl base64 -d|gzip -d)\n\n" \
+    "$MYVER" \
+    "2013 shmilee <shmilee.zju@gmail.com>"\
+    "$(gettext 'This program may be freely redistributed under')" \
+    "$(gettext 'the terms of the GNU General Public License.')"
 } #}}}
 
 usage() { #{{{
