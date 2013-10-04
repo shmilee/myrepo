@@ -1158,7 +1158,7 @@ usage() { #{{{
     printf -- "$(gettext "%s With option -A, pkgs you have built must be in the same DIR with srcfile.")\n" "2)"
     printf -- "$(gettext "%s With option -R, package will be removed into %s.")\n" "3)" "$TRASH"
     printf -- "$(gettext "%s Option --ignore or --only, only work with option -C or -U to save your time.")\n" "4)"
-    printf -- "$(gettext "%s Use option --git-svn after -U is a good choice.")\n" "5)"
+    printf -- "$(gettext "%s Use option --git after -U is a good choice.")\n" "5)"
     if [ "$(uname -m)" == "x86_64" ];then
         printf -- "$(gettext "%s Ensure the base-devel group is installed in 'NEWROOT' when using option --i686.")\n" "6)"
     fi

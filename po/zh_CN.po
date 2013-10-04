@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: myrepo 0.5\n"
+"Project-Id-Version: myrepo 0.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-08 15:54+0800\n"
+"POT-Creation-Date: 2013-10-04 07:34+0800\n"
 "PO-Revision-Date: 2013-03-12 17:24+0800\n"
 "Last-Translator: shmilee <shmilee.zju@gmail.com>\n"
 "Language-Team: Chinese (simplified) <shmilee.zju@gmail.com>\n"
@@ -443,8 +443,8 @@ msgid ""
 "time."
 msgstr "%s 选项--ignore或--only，仅可以配合-C或-U用来节省时间。"
 
-msgid "%s Use option --git-svn after -U is a good choice."
-msgstr "%s 使用选项-U之后再使用--git-svn是一个好的选择。"
+msgid "%s Use option --git after -U is a good choice."
+msgstr "%s 使用选项-U之后再使用--git是一个好的选择。"
 
 msgid ""
 "%s Ensure the base-devel group is installed in 'NEWROOT' when using option --"

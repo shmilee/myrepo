@@ -8,6 +8,9 @@ _file_p=$TEMP/list_info/$_pkg
 
 echo "Receiving information from AUR ..."
 if curl -LfGs --data-urlencode arg="$_pkg" $_URL >${_file_p}.tmp; then
+    if [ ! -s ${_file_p}.tmp ]; then
+        exit 1
+    fi
     if grep resultcount\"\:0 2>&1 >/dev/null ${_file_p}.tmp;then
         echo "0" > ${_file_p}
     else
@@ -18,4 +21,7 @@ if curl -LfGs --data-urlencode arg="$_pkg" $_URL >${_file_p}.tmp; then
         echo "3) about Maintainer ..."; sleep 0.5s; echo >>${_file_p}
         sed 's/.*Maintainer\":\"//;s/\",\"ID.*//' ${_file_p}.tmp >>${_file_p}
     fi
+    exit 0
+else
+    exit 1
 fi
