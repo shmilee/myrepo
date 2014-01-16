@@ -1149,9 +1149,6 @@ usage() { #{{{
     printf -- "$(gettext "  --ignore <packages>    ignore packages (Format: package1,package2,...)")\n"
     printf -- "$(gettext "  --only <packages>      only do with these packages (Format as --ignore)")\n"
     printf -- "$(gettext "  --git                  force update git svn packages with local srcfiles")\n"
-    if [ "$(uname -m)" == "x86_64" ];then
-        printf -- "$(gettext "  --i686 <NEWROOT>       Chroot to 'NEWROOT' to build i686 package (need sudo, arch-chroot)")\n"
-    fi
     echo
     printf -- "$(gettext "Notes:")\n"
     printf -- "$(gettext "%s Here, 'package' refers to pkgs per architecture grouped by pkgbase.")\n" "1)"
@@ -1159,9 +1156,6 @@ usage() { #{{{
     printf -- "$(gettext "%s With option -R, package will be removed into %s.")\n" "3)" "$TRASH"
     printf -- "$(gettext "%s Option --ignore or --only, only work with option -C or -U to save your time.")\n" "4)"
     printf -- "$(gettext "%s Use option --git after -U is a good choice.")\n" "5)"
-    if [ "$(uname -m)" == "x86_64" ];then
-        printf -- "$(gettext "%s Ensure the base-devel group is installed in 'NEWROOT' when using option --i686.")\n" "6)"
-    fi
     echo
 } #}}}
 
@@ -1224,7 +1218,7 @@ TRASH=$REPO_PATH/trash
 O_V="" #option for being verbose
 O_M="N" # multi threads
 OPT_SHORT="A:CEhI:mR:S:UVv"
-OPT_LONG="add:,check,clean,editaur,git,help,info:,i686:,init,ignore:,multi,only:,remove:,search:,update,verbose,version"
+OPT_LONG="add:,check,clean,editaur,git,help,info:,init,ignore:,multi,only:,remove:,search:,update,verbose,version"
 if ! OPT_TEMP="$(getopt -q -o $OPT_SHORT -l $OPT_LONG -- "$@")";then
     usage;exit 1
 fi
@@ -1252,7 +1246,6 @@ while true; do
         --ignore)     shift; IGNORE_PKGS+=($(echo $1|sed 's/,/ /g')) ;;
         --only)       shift; ONLY_PKGS+=($(echo $1|sed 's/,/ /g'));;
         --git)        OPER+='G ';;
-        --i686)       shift; i686_ROOT=$1 ;;
         --)           OPT_IND=0; shift; break ;;
         *)            usage; exit 1 ;;
     esac
