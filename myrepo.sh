@@ -14,7 +14,7 @@
 export TEXTDOMAIN='myrepo'
 export TEXTDOMAINDIR='/usr/share/locale'
 
-MYVER=0.6
+MYVER=0.7
 CONF_FILE=/etc/myrepo.conf
 LIBPATH=/usr/lib/myrepo
 AURURL="https://aur.archlinux.org"
