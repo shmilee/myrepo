@@ -160,6 +160,9 @@ get_files() { #{{{
             ;;
         -p)
             files=($(basename -a $(ls $2/$3*$4*pkg.tar* 2>/dev/null) 2>/dev/null|sed '/.*.sig$/d'))
+            if [ "${#files[@]}" == "0" ];then
+                files=($(basename -a $(ls $2/$3*pkg.tar* 2>/dev/null) 2>/dev/null|sed '/.*.sig$/d'))
+            fi
             ;;
         *)
             msg "Unknown option of get_files."
@@ -283,7 +286,7 @@ read_srcfile() { #{{{
     case $1 in
         -n)
             if grep ^pkgbase $TEMP/pkgbuild/$3/PKGBUILD 2>&1 >/dev/null;then # more than one pkg
-                local num=$(grep pkgver $TEMP/pkgbuild/$3/PKGBUILD -n -m1|cut -d: -f1)
+                local num=$(grep ^license $TEMP/pkgbuild/$3/PKGBUILD -n -m1|cut -d: -f1)
                 sed -n "1,${num}p" $TEMP/pkgbuild/$3/PKGBUILD > $TEMP/pkgbuild/$3/PKGBUILD_n
                 source $TEMP/pkgbuild/$3/PKGBUILD_n
                 echo ${pkgname[@]}
