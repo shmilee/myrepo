@@ -382,6 +382,7 @@ build_aur_pkg() {
         # change version for git or svn ...
         cd $TEMP/$name
         newVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD)-$(awk '/^pkgrel=/,sub(/pkgrel=/,"",$1){printf $1}' PKGBUILD)
+        newVer=$(echo $newVer|sed 's/"//g') #deal with pkgver="x.x"
         if [ "$aurVer" != "$newVer" ];then
             echo $newVer > $name-newver #newVersion file
         fi
