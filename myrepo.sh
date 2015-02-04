@@ -8,7 +8,7 @@
 ##           one PKGBUILD => package.x86_64 => pkg1.x86_64 pkg2.x86_64 ...  name-ver-rel-arch.pkg .tar.xz
 ##                           package.any    => pkg1.any    pkg2.any    ...
 ##  arch=('any')
-##  depends=('grep' 'pacman')
+##  depends=('grep' 'pacman' 'devtools')
 
 ## gettext initialization
 export TEXTDOMAIN='myrepo'
@@ -311,56 +311,65 @@ read_srcfile() { #{{{
 dual_makepkg() { #{{{
     local name=$(basename $1)
     cd $1
-    if ! makepkg -sL; then
-        BUILD_RESULT="No pkg build!"
-        return 1
-    elif ! makepkg --allsource; then
+
+    if ! makepkg --allsource; then
         BUILD_RESULT="No source file build!"
+        return 1
+    fi
+    if ! makechrootpkg -r $x86_64_ROOT; then
+        BUILD_RESULT="No pkg build!"
         return 2
     fi
     ls *any.pkg.tar* 2>/dev/null >/dev/null # arch=any?
     #build i686 package in x86_64, when arch != any
     if [ "$?" != 0 -a x"$i686_ROOT" != x -a "$(uname -m)" == "x86_64" ];then
         BUILD_RESULT="$(uname -m) pkg build, "
-        msg "$(gettext "Chrooting into %s to Build i686 package.")" "$i686_ROOT" 
-        if sudo arch-chroot $i686_ROOT/ linux32 echo -n;then
-            [[ -d $i686_ROOT/work ]] || sudo chroot $i686_ROOT/ mkdir /work
-            sudo tar --force-local -zxf $name-*-*.src.tar* -C $i686_ROOT/work/
-            sudo arch-chroot $i686_ROOT/ bash -c\
-                "cd /work/$name; linux32 makepkg -sL -f --asroot && linux32 makepkg -f --allsource --asroot && touch succ"
-            # pkg file
-            if [ -f $i686_ROOT/work/$name/succ ];then
-                cp $i686_ROOT/work/$name/$name-*pkg.tar* $1/
-            else
-                msg "$(gettext "Build i686 package .. failed.")"
-                BUILD_RESULT+="i686 pkg failed."
-                return 3
-            fi
-            # src file
-            local srcname=$(ls $name-*-*.src.tar*)
-            tar --force-local -tf $i686_ROOT/work/$name/$srcname|sort >i686_src_tmp
-            tar --force-local -tf $srcname|sort >x86_64_src_tmp
-            if ! diff i686_src_tmp x86_64_src_tmp 2>&1 >/dev/null;then
-                msg "$(gettext "Merging two different source files ...")"
-                tar --force-local -zxf $srcname
-                tar --force-local -zxf $i686_ROOT/work/$name/$srcname
-                tar --force-local -zcf $srcname $name/
-                msg "$(gettext "Done.")"
-            fi
-            BUILD_RESULT+="i686 pkg build."
-        else
-            error "$(gettext "Failed to chroot into %s.")" "$i686_ROOT"
-            BUILD_RESULT+="chroot failed."
-            return 4
+        msg "$(gettext "Chrooting into %s to Build i686 package.")" "$i686_ROOT"
+        makechrootpkg -r $i686_ROOT
+        if [[ $? != 0 ]];then
+            msg "$(gettext "Build i686 package .. failed.")"
+            BUILD_RESULT+="i686 pkg failed."
+            return 3
         fi
+         # merge src file
+        local srcname=$(ls $name-*-*.src.tar*)
+        mv $srcname x64-$srcname
+        tar --force-local -tf x64-$srcname|sort >x86_64_src_tmp
+        makechrootpkg -r $i686_ROOT -- --allsource
+        tar --force-local -tf $srcname|sort >i686_src_tmp
+        if ! diff i686_src_tmp x86_64_src_tmp 2>&1 >/dev/null;then
+            msg "$(gettext "Merging two different source files ...")"
+            tar --force-local -zxf x64-$srcname
+            tar --force-local -zxf $srcname
+            tar --force-local -zcf $srcname $name/
+            msg "$(gettext "Done.")"
+        fi
+        BUILD_RESULT+="i686 pkg build."
     fi
     return 0
+}
+
+# change version for git or svn ...
+# usage  : version_changed [tarball extract path]
+version_changed() {
+    local name=$(basename $1)
+    cd $1
+    local oldVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD)-$(awk '/^pkgrel=/,sub(/pkgrel=/,"",$1){printf $1}' PKGBUILD)
+    oldVer=$(echo $oldVer|sed 's/"//g') #deal with pkgver="x.x"
+    makepkg -o
+    local newVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD)-$(awk '/^pkgrel=/,sub(/pkgrel=/,"",$1){printf $1}' PKGBUILD)
+    newVer=$(echo $newVer|sed 's/"//g')
+    if [ "$oldVer" != "$newVer" ];then
+        echo $newVer > $name-newver #newVersion file
+        return 0
+    else
+        return 1
+    fi
 }
 
 ## build package $1 from aur in directory($TEMP/PkgName/)
 # usage  : build_aur_pkg [PkgName] [localVersion] [aurVersion] [tarballURL]
 # result : get PkgName-ver-rel-arch.pkg.tar.xz PkgName-ver-rel.src.tar.gz
-#          get new git version to file 'PkgName-newver'
 #          if `makepkg` fail, return 1; if tarball broken, return 2
 build_aur_pkg() {
     local name="$1" locVer="$2" aurVer="$3" tarURL="$4"
@@ -374,20 +383,12 @@ build_aur_pkg() {
     # get tarball and extract to $TEMP
     if curl -Lfs $tarURL |tar xfz - -C $TEMP $O_V;then
         BUILD_RESULT=""
+        version_changed $TEMP/$name
         dual_makepkg $TEMP/$name
         if [ "$?" != 0 ];then
             error "$(gettext "Failed to run \`makepkg\`: %s")" "$BUILD_RESULT"
             return 1
         fi
-        # change version for git or svn ...
-        cd $TEMP/$name
-        newVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD)-$(awk '/^pkgrel=/,sub(/pkgrel=/,"",$1){printf $1}' PKGBUILD)
-        newVer=$(echo $newVer|sed 's/"//g') #deal with pkgver="x.x"
-        if [ "$aurVer" != "$newVer" ];then
-            echo $newVer > $name-newver #newVersion file
-        fi
-        # makepkg error file
-        # tar zcfv ../$name-$aurVer.error.tar.gz --exclude=../$name/src --exclude=../$name/pkg ../$name
     else
         error "$(gettext "Tarball of %s is broken.")" "$name:$aurVer"
         return 2
@@ -1031,7 +1032,7 @@ update_git() { #{{{
         for name in ${git_names[@]}; do
             ((i++))
             msg "$(gettext "(%s/%s) %s :")" "$i" "${#git_names[@]}" "$name"
-            ver=""; srcfile=""; old_pkgs=() ## cp old_pkg to make `makepkg fail without option -f`
+            ver=""; srcfile=""
             read -p "==> $(gettext "Press ENTER to continue, any other to skip: ")" SSTTOOPP
             if [ x"$SSTTOOPP" != x ];then
                 pas_name+=($name)
@@ -1039,25 +1040,26 @@ update_git() { #{{{
             fi
             ver=$(get_newest $(info_pool_db -v $name))
             srcfile=$(get_files -s $SRCS $name "$ver")
-            if tar zx -C $TEMP/git-svn -f $POOLDB $name/$ver;then
-                old_pkgs=($(cat $TEMP/git-svn/$name/$ver | sed "s|^|$PKGS/|g"))
-                # begin
-                tar --force-local -zx ${O_V} -C $TEMP/git-svn -f $SRCS/$srcfile
-                cp ${O_V} ${old_pkgs[@]} $TEMP/git-svn/$name/
-                # makepkg
-                BUILD_RESULT=""
-                dual_makepkg $TEMP/git-svn/$name/
-                if [ "$?" != 0 ];then
-                    error "$(gettext "Failed to run \`makepkg\`: %s")" "$BUILD_RESULT"
-                    pas_name+=($name)
+            if tar --force-local -zx ${O_V} -C $TEMP/git-svn -f $SRCS/$srcfile;then
+                if version_changed $TEMP/git-svn/$name; then
+                    # makepkg
+                    BUILD_RESULT=""
+                    dual_makepkg $TEMP/git-svn/$name/
+                    if [ "$?" != 0 ];then
+                        error "$(gettext "Failed to run \`makepkg\`: %s")" "$BUILD_RESULT"
+                        pas_name+=($name)
+                    else
+                        # get new version pkg
+                        cd $TEMP/git-svn/$name/
+                        srcfile=$(get_newest $(get_files -s . $name))
+                        nVer=$(get_namver -v $srcfile)
+                        add_package $name-${nVer}.src.tar.gz
+                        msg "$(gettext "Update package %s(%s=>%s) from AUR, done.")" "$name" "$ver" "$nVer"
+                        suc_name+=("$name")
+                    fi
                 else
-                    # get new version pkg
-                    cd $TEMP/git-svn/$name/
-                    srcfile=$(get_newest $(get_files -s . $name))
-                    nVer=$(get_namver -v $srcfile)
-                    add_package $name-${nVer}.src.tar.gz
-                    msg "$(gettext "Update package %s(%s=>%s) from AUR, done.")" "$name" "$ver" "$nVer"
-                    suc_name+=("$name")
+                    msg "$(gettext "No new version, PASS.")"
+                    pas_name+=($name)
                 fi
             else
                 error "$(gettext "Ignore.")"
