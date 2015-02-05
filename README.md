@@ -3,7 +3,7 @@ Introduction
 
 a shell script  
 Add, remove, check and update packages(from AUR) for my personal repo.  
-depends=('grep' 'pacman')
+depends=('grep' 'pacman' 'devtools')
 
 Repo tree
 ====

@@ -14,7 +14,7 @@
 export TEXTDOMAIN='myrepo'
 export TEXTDOMAINDIR='/usr/share/locale'
 
-MYVER=0.7
+MYVER=0.8
 CONF_FILE=/etc/myrepo.conf
 LIBPATH=/usr/lib/myrepo
 AURURL="https://aur.archlinux.org"
@@ -341,57 +341,28 @@ dual_makepkg() { #{{{
             msg "$(gettext "Merging two different source files ...")"
             tar --force-local -zxf x64-$srcname
             tar --force-local -zxf $srcname
+            rm x64-$srcname $srcname
             tar --force-local -zcf $srcname $name/
             msg "$(gettext "Done.")"
         fi
         BUILD_RESULT+="i686 pkg build."
     fi
     return 0
-}
+} #}}}
 
 # change version for git or svn ...
 # usage  : version_changed [tarball extract path]
-version_changed() {
+version_changed() { #{{{
     local name=$(basename $1)
     cd $1
-    local oldVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD)-$(awk '/^pkgrel=/,sub(/pkgrel=/,"",$1){printf $1}' PKGBUILD)
-    oldVer=$(echo $oldVer|sed 's/"//g') #deal with pkgver="x.x"
+    local oldVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD |sed -e 's/"//g' -e "s/'//g")
     makepkg -o
-    local newVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD)-$(awk '/^pkgrel=/,sub(/pkgrel=/,"",$1){printf $1}' PKGBUILD)
-    newVer=$(echo $newVer|sed 's/"//g')
+    local newVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD |sed -e 's/"//g' -e "s/'//g")
     if [ "$oldVer" != "$newVer" ];then
         echo $newVer > $name-newver #newVersion file
         return 0
     else
         return 1
-    fi
-}
-
-## build package $1 from aur in directory($TEMP/PkgName/)
-# usage  : build_aur_pkg [PkgName] [localVersion] [aurVersion] [tarballURL]
-# result : get PkgName-ver-rel-arch.pkg.tar.xz PkgName-ver-rel.src.tar.gz
-#          if `makepkg` fail, return 1; if tarball broken, return 2
-build_aur_pkg() {
-    local name="$1" locVer="$2" aurVer="$3" tarURL="$4"
-    local newVer
-
-    # pkgver-pkgrel, if pkgver is same, then no need to download sources again.
-    if [ ${locVer%-*} == ${aurVer%-*} ];then
-        [ -f $SRCS/$name-$locVer.src.tar.gz ] && \
-            tar --force-local -zxf $SRCS/$name-$locVer.src.tar.gz $O_V -C $TEMP 
-    fi
-    # get tarball and extract to $TEMP
-    if curl -Lfs $tarURL |tar xfz - -C $TEMP $O_V;then
-        BUILD_RESULT=""
-        version_changed $TEMP/$name
-        dual_makepkg $TEMP/$name
-        if [ "$?" != 0 ];then
-            error "$(gettext "Failed to run \`makepkg\`: %s")" "$BUILD_RESULT"
-            return 1
-        fi
-    else
-        error "$(gettext "Tarball of %s is broken.")" "$name:$aurVer"
-        return 2
     fi
 } #}}}
 
@@ -491,21 +462,6 @@ ln_repo_db() {
         done
     else
         msg "Unknown option of ln_repo_db."
-    fi
-} #}}}
-
-# if SIGN packages, check USER_ID for Gnupg
-check_user_id() { #{{{
-    if [ $SIGN != 1 ];then
-        return 0
-    fi
-    if [ x"$USER_ID" == x ]; then
-        error "$(gettext "Lost 'USER_ID', edit configure file %s.")" "$CONF_FILE"
-        exit 1
-    fi
-    msg "$(gettext "Checking key signatures for '%s' ...")" "$USER_ID"
-    if ! gpg --check-sigs $USER_ID >/dev/null; then
-        exit 1
     fi
 } #}}}
 
@@ -997,12 +953,30 @@ update_aur() { #{{{
             tarballURL=$AURURL$(get_aur_info -p $name)
             ((i++))
             msg "$(gettext "(%s/%s) Updating package %s(%s=>%s) from AUR")" "$i" "${#up_name[@]}" "$name" "$loc_ver" "$aur_ver"
-            if build_aur_pkg $name $loc_ver $aur_ver $tarballURL;then
-                [[ -f $TEMP/$name/$name-newver ]] && aur_ver=$(cat $TEMP/$name/$name-newver)
-                add_package $TEMP/$name/$name-$aur_ver.src.tar.gz
-                msg "$(gettext "Update package %s(%s=>%s) from AUR, done.")" "$name" "$loc_ver" "$aur_ver"
-               suc_name+=("$name")
-           else
+            # pkgver-pkgrel, if pkgver is same, then no need to download sources again.
+            if [ ${locVer%-*} == ${aurVer%-*} ];then
+                [ -f $SRCS/$name-$locVer.src.tar.gz ] && \
+                    tar --force-local -zxf $SRCS/$name-$locVer.src.tar.gz $O_V -C $TEMP 
+            fi
+            # get tarball and extract to $TEMP
+            if curl -Lfs $tarballURL |tar xfz - -C $TEMP $O_V;then
+                BUILD_RESULT=""
+                version_changed $TEMP/$name
+                dual_makepkg $TEMP/$name
+                if [ "$?" != 0 ];then
+                    error "$(gettext "Failed to run \`makepkg\`: %s")" "$BUILD_RESULT"
+                    fal_name+=("$name")
+                else
+                    if [ -f $TEMP/$name/$name-newver ]; then
+                        srcfile=$(get_newest $(get_files -s $TEMP/$name/ $name))
+                        aur_ver=$(get_namver -v $srcfile)
+                    fi
+                    add_package $TEMP/$name/$name-$aur_ver.src.tar.gz
+                    msg "$(gettext "Update package %s(%s=>%s) from AUR, done.")" "$name" "$loc_ver" "$aur_ver"
+                    suc_name+=("$name")
+                fi
+            else
+                error "$(gettext "Tarball of %s is broken.")" "$name:$aurVer"
                 fal_name+=("$name")
             fi
         done
@@ -1165,16 +1139,45 @@ usage() { #{{{
     echo
 } #}}}
 
+# check value of variable
+# return : no value 0; else 1
+no_va() { #{{{
+    local var=$1
+    eval local value=\$$var
+    if [[ x"$value" == x ]]; then
+        return 0
+    else
+        return 1
+    fi
+} #}}}
+
+# if SIGN packages, check USER_ID for Gnupg
+check_user_id() { #{{{
+    if [ $SIGN != 1 ];then
+        return 0
+    fi
+    if no_va USER_ID; then
+        error "$(gettext "Lost '%s', edit configure file %s.")" "USER_ID" "$CONF_FILE"
+        exit 1
+    fi
+    msg "$(gettext "Checking key signatures for '%s' ...")" "$USER_ID"
+    if ! gpg --check-sigs $USER_ID >/dev/null; then
+        exit 1
+    fi
+} #}}}
+
 ##
 # BEGIN MAIN
 ##
 
 if [ -f $CONF_FILE ]; then
     source $CONF_FILE
-    if [ x$REPO_PATH == x -o x$REPO_NAME == x -o x$TEMP == x -o x$USE_COLOR == x -o x$SIGN == x ]; then
-        error "$(gettext "Some variables have no value. Edit configure file %s.")" "$CONF_FILE"
-        exit 1
-    fi
+    for var in REPO_PATH REPO_NAME TEMP USE_COLOR SIGN; do
+        if no_va $var; then
+            error "$(gettext "Lost '%s', edit configure file %s.")" "$var" "$CONF_FILE"
+            exit  1
+        fi
+    done
 else
     error "$(gettext "Lost configure file %s !")" "$CONF_FILE"
     exit 1
@@ -1289,9 +1292,19 @@ else
     # create lock file
     echo $$ >$TEMP/myrepo.lock
     trap '{ rm $TEMP/myrepo.lock; } 2>/dev/null' EXIT
-    # check_user_id with -A -C -U
+    # check_user_id with -A -C -U --git
     if echo $OPER|grep -E 'A|C|U|G' >/dev/null;then
         check_user_id
+    fi
+    # check chrootdir with -U --git
+    if echo $OPER|grep -E 'U|G' >/dev/null;then
+        if no_va x86_64_ROOT || [ ! -d "$x86_64_ROOT" ]; then
+            error "$(gettext "Lost '%s', edit configure file %s.")" "x86_64_ROOT" "$CONF_FILE"
+            exit 1
+        fi
+        if no_va i686_ROOT || [ ! -d "$i686_ROOT" ]; then
+            warning "$(gettext "Lost '%s', edit configure file %s.")" "i686_ROOT" "$CONF_FILE"
+        fi
     fi
     # operations, ADD_VERIFY=1, false
     for oper in $OPER; do

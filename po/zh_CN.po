@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the myrepo package.
 # shmilee <shmilee.zju@gmail.com>, 2013.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: myrepo 0.7\n"
+"Project-Id-Version: myrepo 0.8\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-16 13:38+0800\n"
+"POT-Creation-Date: 2015-02-05 16:25+0800\n"
 "PO-Revision-Date: 2013-03-12 17:24+0800\n"
 "Last-Translator: shmilee <shmilee.zju@gmail.com>\n"
 "Language-Team: Chinese (simplified) <shmilee.zju@gmail.com>\n"
@@ -74,15 +73,6 @@ msgstr "正在合并两个不同的源码包文件 ..."
 msgid "Done."
 msgstr "完成。"
 
-msgid "Failed to chroot into %s."
-msgstr "chroot到%s失败。"
-
-msgid "Failed to run `makepkg`: %s"
-msgstr "运行`makepkg`失败 : %s。"
-
-msgid "Tarball of %s is broken."
-msgstr "%s的源码包已损坏。"
-
 msgid "Renew pool database failed."
 msgstr "更新pool的数据库失败。"
 
@@ -109,12 +99,6 @@ msgstr "从源数据库中删除软件包%s(%s) ..."
 
 msgid "Remove links for %s ..."
 msgstr "删除%s的链接文件..."
-
-msgid "Lost 'USER_ID', edit configure file %s."
-msgstr "变量 'USER_ID' 未赋值，请编辑配置文件 %s 。"
-
-msgid "Checking key signatures for '%s' ..."
-msgstr "正在检查 %s 的密钥签名 ..."
 
 msgid "Cannot find source file: %s !"
 msgstr "无法找到源码包文件：%s！"
@@ -308,8 +292,14 @@ msgstr "概述，%s个软件需要升级：\\n%s"
 msgid "(%s/%s) Updating package %s(%s=>%s) from AUR"
 msgstr "(%s/%s) 正在从AUR升级软件%s,版本从%s到%s"
 
+msgid "Failed to run `makepkg`: %s"
+msgstr "运行`makepkg`失败 : %s。"
+
 msgid "Update package %s(%s=>%s) from AUR, done."
 msgstr "从AUR升级软件%s（版本从%s到%s），完毕。"
+
+msgid "Tarball of %s is broken."
+msgstr "%s的源码包已损坏。"
 
 msgid "Finish updating %s packages."
 msgstr "%s个软件升级完成。"
@@ -336,6 +326,9 @@ msgstr "概述，%s个 -git -svn 类的软件需要升级：\\n%s"
 
 msgid "(%s/%s) %s :"
 msgstr "(%s/%s) %s : "
+
+msgid "No new version, PASS."
+msgstr "无新版本，跳过。"
 
 msgid "Pass: %s\\n%s"
 msgstr "跳过：%s个\\n%s"
@@ -439,8 +432,11 @@ msgstr "%s 选项--ignore或--only，仅可以配合-C或-U用来节省时间。
 msgid "%s Use option --git after -U is a good choice."
 msgstr "%s 使用选项-U之后再使用--git比较好。"
 
-msgid "Some variables have no value. Edit configure file %s."
-msgstr "一些变量未赋值。请编辑配置文件 %s 。"
+msgid "Lost '%s', edit configure file %s."
+msgstr "变量 '%s' 未赋值，请编辑配置文件 %s 。"
+
+msgid "Checking key signatures for '%s' ..."
+msgstr "正在检查 %s 的密钥签名 ..."
 
 msgid "Lost configure file %s !"
 msgstr "无法找到配置文件：%s！"
@@ -463,3 +459,4 @@ msgstr "请至少指定‘%s’中的一个操作。"
 
 msgid "All files in %s will be removed !"
 msgstr "%s中所有的文件将被删除！"
+
