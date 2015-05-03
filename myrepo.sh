@@ -42,13 +42,13 @@ error() {
 
 logging() {
     case $1 in
-        -a) mesg="A-D-D-" ;;
-        -u) mesg="UPDATE" ;;
-        -r) mesg="REMOVE" ;;
+        -a) mesg="A" ;;
+        -u) mesg="U" ;;
+        -r) mesg="R" ;;
         *)  msg "Unknown option of logging." ;;
     esac
     shift
-    echo -e "[$(date +%F" "%H:%M)] ${mesg} $@" >>$LOG
+    echo -e "[$(date +%y%m%d%H%M)] ${mesg} $@" >>$LOG
 }
 
 ## list "${@:3}", $1 beginning number, $2 the number of items in a row
@@ -1111,8 +1111,8 @@ version() { #{{{
 usage() { #{{{
     printf "myrepo %s\n" "$MYVER"
     printf -- "$(gettext "Usage: %s [options]")\n" "$(basename $0)"
-	echo
-	printf -- "$(gettext "Options:")\n"
+    echo
+    printf -- "$(gettext "Options:")\n"
     printf -- "$(gettext "  -A, --add <p/srcfile>  add package into repo")\n"
     printf -- "$(gettext "  -C, --check            check repo, link, signature and so on")\n"
     printf -- "$(gettext "  -E, --editaur          edit 'list_AUR'")\n"
