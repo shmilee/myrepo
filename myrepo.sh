@@ -954,9 +954,9 @@ update_aur() { #{{{
             ((i++))
             msg "$(gettext "(%s/%s) Updating package %s(%s=>%s) from AUR")" "$i" "${#up_name[@]}" "$name" "$loc_ver" "$aur_ver"
             # pkgver-pkgrel, if pkgver is same, then no need to download sources again.
-            if [ ${locVer%-*} == ${aurVer%-*} ];then
-                [ -f $SRCS/$name-$locVer.src.tar.gz ] && \
-                    tar --force-local -zxf $SRCS/$name-$locVer.src.tar.gz $O_V -C $TEMP 
+            if [[ ${loc_ver%-*} == ${aur_ver%-*} ]];then
+                [ -f $SRCS/$name-${loc_ver}.src.tar.gz ] && \
+                    tar --force-local -zxf $SRCS/$name-${loc_ver}.src.tar.gz $O_V -C $TEMP 
             fi
             # get tarball and extract to $TEMP
             if curl -Lfs $tarballURL |tar xfz - -C $TEMP $O_V;then
@@ -976,7 +976,7 @@ update_aur() { #{{{
                     suc_name+=("$name")
                 fi
             else
-                error "$(gettext "Tarball of %s is broken.")" "$name:$aurVer"
+                error "$(gettext "Tarball of %s is broken.")" "$name:$aur_ver"
                 fal_name+=("$name")
             fi
         done
