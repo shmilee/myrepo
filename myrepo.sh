@@ -277,25 +277,31 @@ get_repo_filename() { #{{{
 } #}}}
 
 ## read the PKGBUILD in source file
-# usage  : read_srcfile [-n|-a] [path/to/srcfile] [package-name]
+# usage  : read_srcfile [-n|-a|-m] [path/to/srcfile | path/to/PKGBUILD]
 # return : -n) get pkg names
-#          -a) get more information
+#          -a) get arch
+#          -m) get more information
 read_srcfile() { #{{{
     mkdir $TEMP/pkgbuild
-    tar --force-local -zx -C $TEMP/pkgbuild -f $2 $3/PKGBUILD 2>&1 >/dev/null
+    if [[ $(basename $2) == PKGBUILD ]]; then
+        local PKGBUILD_path=$2
+    else
+        local _name=$(get_namver -n $(basename $2))
+        tar --force-local -zx -C $TEMP/pkgbuild -f $2 $_name/PKGBUILD 2>&1 >/dev/null
+        local PKGBUILD_path=$TEMP/pkgbuild/$_name/PKGBUILD
+    fi
+    local num=$(grep -E '^install|^url|^license|^options|^arch' $PKGBUILD_path -n 2>/dev/null \
+        | cut -d: -f1 | sort -n -r | head -n1)
+    sed -n "1,${num}p" $PKGBUILD_path > $TEMP/pkgbuild/PKGBUILD_tmp
+    source $TEMP/pkgbuild/PKGBUILD_tmp
     case $1 in
         -n)
-            if grep ^pkgbase $TEMP/pkgbuild/$3/PKGBUILD 2>&1 >/dev/null;then # more than one pkg
-                local num=$(grep ^license $TEMP/pkgbuild/$3/PKGBUILD -n -m1|cut -d: -f1)
-                sed -n "1,${num}p" $TEMP/pkgbuild/$3/PKGBUILD > $TEMP/pkgbuild/$3/PKGBUILD_n
-                source $TEMP/pkgbuild/$3/PKGBUILD_n
-                echo ${pkgname[@]}
-                unset pkgbase pkgname pkgver
-            else # only one pkg
-                echo $3
-            fi
+            echo ${pkgname[@]}
             ;;
         -a)
+            echo ${arch[@]}
+            ;;
+        -m)
             : # name or names? version? desc??? url??
             ;;
         *)
@@ -303,6 +309,7 @@ read_srcfile() { #{{{
             return 1
             ;;
     esac
+    unset pkgbase pkgname pkgver pkgrel pkgdesc arch url depends source license
     rm -r $TEMP/pkgbuild
 } #}}}
 
@@ -310,20 +317,30 @@ read_srcfile() { #{{{
 # usage  : dual_makepkg [tarball extract path]
 dual_makepkg() { #{{{
     local name=$(basename $1)
+    local arch=$(read_srcfile -a $1/PKGBUILD)
+    if [ x"$arch" == xany ]; then
+        arch=x86_64 # arch==any, build package in $x86_64_ROOT
+    fi
     cd $1
 
     if ! makepkg --allsource; then
         BUILD_RESULT="No source file build!"
         return 1
     fi
-    if ! makechrootpkg -r $x86_64_ROOT; then
-        BUILD_RESULT="No pkg build!"
-        return 2
+    # arch==any, arch==i686 x86_64, arch==x86_64
+    if inclusion x86_64 $arch; then
+        if ! makechrootpkg -r $x86_64_ROOT; then
+            BUILD_RESULT="No pkg build!"
+            return 2
+        fi
+        BUILD_RESULT="x86_64 (or any) pkg build. "
     fi
-    ls *any.pkg.tar* 2>/dev/null >/dev/null # arch=any?
-    #build i686 package in x86_64, when arch != any
-    if [ "$?" != 0 -a x"$i686_ROOT" != x -a "$(uname -m)" == "x86_64" ];then
-        BUILD_RESULT="$(uname -m) pkg build, "
+    # build i686 package, when arch==i686, arch==i686 x86_64
+    if inclusion i686 $arch; then
+        if [ x"$i686_ROOT" == x ]; then
+            BUILD_RESULT="i686 pkg failed. Lost 'i686_ROOT' directory."
+            return 3
+        fi
         msg "$(gettext "Chrooting into %s to Build i686 package.")" "$i686_ROOT"
         makechrootpkg -r $i686_ROOT
         if [[ $? != 0 ]];then
@@ -331,7 +348,7 @@ dual_makepkg() { #{{{
             BUILD_RESULT+="i686 pkg failed."
             return 3
         fi
-         # merge src file
+        # merge src file
         local srcname=$(ls $name-*-*.src.tar*)
         mv $srcname x64-$srcname
         tar --force-local -tf x64-$srcname|sort >x86_64_src_tmp
@@ -478,7 +495,7 @@ add_package() { #{{{
     local srcpath=$(dirname $1) srcfile=$(basename $1)
     local name=$(get_namver -n $srcfile) version=$(get_namver -v $srcfile)
     # get pkg file names
-    local pkg_names=($(read_srcfile -n $1 $name))
+    local pkg_names=($(read_srcfile -n $1))
     for _na in ${pkg_names[@]}; do
         pkg_files+=($(get_files -p $srcpath $_na $version))
     done
