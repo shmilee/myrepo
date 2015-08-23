@@ -1,5 +1,5 @@
 # Chinese translations for myrepo package.
-# Copyright (C) 2013 by shmilee <shmilee.zju@gmail.com>
+# Copyright (C) 2013-2015 by shmilee <shmilee.zju@gmail.com>
 # This file is distributed under the same license as the myrepo package.
 # shmilee <shmilee.zju@gmail.com>, 2013.
 #
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: myrepo 0.8\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-05 16:25+0800\n"
+"POT-Creation-Date: 2015-08-23 20:04+0800\n"
 "PO-Revision-Date: 2013-03-12 17:24+0800\n"
 "Last-Translator: shmilee <shmilee.zju@gmail.com>\n"
 "Language-Team: Chinese (simplified) <shmilee.zju@gmail.com>\n"
@@ -16,135 +16,112 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Lost File: %s !"
+msgstr "无法找到文件： %s ！"
+
+msgid "Lost '%s', edit configure file %s."
+msgstr "变量 '%s' 未赋值，请编辑配置文件 %s 。"
+
+msgid " A myrepo is running!"
+msgstr "有一个 myrepo 已在运行！"
+
+msgid "If you're sure a myrepo is not already running, you can remove %s."
+msgstr "如果你确定没有 myrepo 在运行，你可以删除 %s 。"
+
+msgid ""
+"Some REPO directories or files do not exist. Use '--init' to initialize "
+"repo, or check them by youself!"
+msgstr ""
+"软件源的一些目录或文件不存在。用 '--init' 初始化软件源，或者先手动检查一下它"
+"们！"
+
+msgid "At least one operation of '%s', please."
+msgstr "请至少指定 ‘%s’ 中的一个操作。"
+
+msgid "All files in %s will be removed !"
+msgstr "%s 中所有的文件将被删除！"
+
+msgid "Press ENTER to continue, any other to skip: "
+msgstr "按回车键 ENTER 继续，其他任意键跳过："
+
+msgid "Failed to create %s !"
+msgstr "创建 %s 失败！"
+
 msgid "WARNING:"
 msgstr "警告："
 
 msgid "ERROR:"
 msgstr "错误："
 
-msgid "Nonexistent Directory:\\n%s"
-msgstr "缺失目录：\\n%s"
-
-msgid "Nonexistent File:\\n%s"
-msgstr "缺失文件：\\n%s"
-
 msgid "A name for the repository is needed."
 msgstr "软件源需要一个名称。"
 
 msgid "Directory %s has been existent, remove it?"
-msgstr "目录%s已存在，删除它？"
+msgstr "目录 %s 已存在，删除它？"
 
 msgid "Think twice before you remove all files in %s !"
-msgstr "在删除%s中所有的文件之前，请三思！"
+msgstr "在删除 %s 中所有的文件之前，请三思！"
 
 msgid "Press 'yes' to continue, any other to skip: "
-msgstr "输入'yes'继续，输入其他任意键跳过："
+msgstr "输入 'yes' 继续，输入其他任意键跳过："
 
 msgid "Initializing repository %s in %s ..."
-msgstr "初始化软件源%s(位于%s) ..."
+msgstr "初始化软件源 %s (位于 %s ) ..."
 
 msgid "%s Creating directories:\\n%s"
-msgstr "%s 创建目录：\\n%s"
+msgstr "%s 创建目录：\\n %s"
 
 msgid "Failed to create directories."
 msgstr "创建目录失败。"
 
 msgid "%s Creating files:\\n%s"
-msgstr "%s 创建文件：\\n%s"
-
-msgid "Failed to create %s !"
-msgstr "创建%s失败！"
+msgstr "%s 创建文件：\\n %s"
 
 msgid "Finish initializing repository %s."
-msgstr "初始化软件源%s完毕。"
-
-msgid "Check you network, please."
-msgstr "请检查您的网络。"
-
-msgid "Chrooting into %s to Build i686 package."
-msgstr "正在chroot到 %s 以构建i686软件包。"
-
-msgid "Build i686 package .. failed."
-msgstr "构建i686架构的软件包 .. 失败。"
-
-msgid "Merging two different source files ..."
-msgstr "正在合并两个不同的源码包文件 ..."
-
-msgid "Done."
-msgstr "完成。"
-
-msgid "Renew pool database failed."
-msgstr "更新pool的数据库失败。"
-
-msgid "This should never happen to you !"
-msgstr "不该发生的错误！"
-
-msgid "Adding pkg %s to repo database (%s) ..."
-msgstr "添加软件包%s到源数据库(%s) ..."
-
-msgid "Making links for %s ..."
-msgstr "为%s创建链接文件..."
-
-msgid "Remove old links first ..."
-msgstr "在此之前先删除旧的链接..."
-
-msgid "Renew repo database (%s) ..."
-msgstr "更新软件源%s架构的数据库 ..."
-
-msgid "(%s)Done."
-msgstr "(%s)完成。"
-
-msgid "Removing pkg %s from repo database (%s) ..."
-msgstr "从源数据库中删除软件包%s(%s) ..."
-
-msgid "Remove links for %s ..."
-msgstr "删除%s的链接文件..."
+msgstr "初始化软件源 %s 完毕。"
 
 msgid "Cannot find source file: %s !"
-msgstr "无法找到源码包文件：%s！"
+msgstr "无法找到源码包文件： %s ！"
 
 msgid "Package %s has not been built, do it youself please."
-msgstr "软件%s未被创建，请您先手动创建。"
+msgstr "软件 %s 未被创建，请您先手动创建。"
 
 msgid "Update package %s from %s to %s ..."
-msgstr "升级软件%s，从版本%s到%s ..."
+msgstr "升级软件 %s ，从版本 %s 到 %s ..."
 
 msgid ""
 "%s is not the latest version, and will add to %s only, without repo in %s."
-msgstr "%s不是最新版本，因此只将其添加到%s，不添加到位于%s的软件源。"
+msgstr "%s 不是最新版本，因此只将其添加到 %s ，不添加到位于 %s 的软件源。"
 
 msgid "Package %s that exists in REPO %s will be overwrited!"
-msgstr "软件%s已在软件源%s中,将会被覆盖！"
+msgstr "软件 %s 已在软件源 %s 中,将会被覆盖！"
 
 msgid "Adding package %s with pkg %s to REPO: %s ..."
-msgstr "添加软件%s(软件包%s)到软件源:%s ..."
+msgstr "添加软件 %s (软件包 %s )到软件源: %s ..."
 
 msgid "Adding package %s to REPO: %s, with %s pkgs:\\n%s"
-msgstr "添加软件%s到软件源:%s，包含%s个软件包：\\n%s"
-
-msgid "Press ENTER to continue, any other to skip: "
-msgstr "按回车键ENTER继续，其他任意键跳过："
+msgstr "添加软件 %s 到软件源: %s ，包含 %s 个软件包：\\n %s"
 
 msgid "Copying source file %s ..."
-msgstr "正在复制源码包文件%s ..."
+msgstr "正在复制源码包文件 %s ..."
 
 msgid "Copying pkg file %s ..."
-msgstr "正在复制软件包文件%s ..."
+msgstr "正在复制软件包文件 %s ..."
 
 msgid "Use USER-ID %s to sign pkg %s ..."
-msgstr "用%s的私钥为软件包%s创建签名 ..."
+msgstr "用 %s 的私钥为软件包 %s 创建签名 ..."
 
 msgid "Renew pool database %s ..."
-msgstr "更新pool的数据库%s ..."
+msgstr "更新pool的数据库 %s ..."
 
 msgid "%s may be broken, check it by youself!"
-msgstr "%s可能已损坏，请您手动检查一下！"
+msgstr "%s 可能已损坏，请您手动检查一下！"
 
 msgid "Finish adding package %s to REPO: %s."
-msgstr "添加软件%s到软件源%s完毕。"
+msgstr "已添加软件 %s 到软件源 %s 。"
 
 msgid "Find %s versions of package %s in %s:\\n%s"
-msgstr "找到%s个版本的软件%s，位于%s：\\n%s"
+msgstr "找到 %s 个版本的软件 %s ，位于 %s ：\\n%s"
 
 msgid "Enter Numbers to remove (e.g. 0 3 5): "
 msgstr "输入您要删除的版本对应的序号（例如 0 3 5）："
@@ -153,37 +130,40 @@ msgid "No package removed!"
 msgstr "未删除任何软件！"
 
 msgid "Find one package %s in %s to remove."
-msgstr "只找到一个版本的软件%s，将要从%s中删除它。"
+msgstr "只找到一个版本的软件 %s ，将要从 %s 中删除它。"
 
 msgid "Removing package %s from repo-db of %s ..."
-msgstr "正在删除所有版本的软件%s，从软件源%s中 ..."
+msgstr "正在删除所有版本的软件 %s ，从软件源 %s 中 ..."
 
 msgid "Downgrading package %s from %s to %s in repo-db of %s ..."
-msgstr "降级软件%s从版本%s到%s，在软件源%s中 ..."
+msgstr "降级软件 %s 从版本 %s 到 %s ，在软件源 %s 中 ..."
 
 msgid "Removing package %s from pool ..."
-msgstr "正在从pool中删除软件%s..."
+msgstr "正在从pool中删除软件 %s ..."
 
 msgid "Removing source file %s ..."
-msgstr "正在删除源码包文件%s ..."
+msgstr "正在删除源码包文件 %s ..."
 
 msgid "Removing pkg file %s ..."
-msgstr "正在删除软件包%s ..."
+msgstr "正在删除软件包 %s ..."
 
 msgid "Removing pkg file signature %s ..."
-msgstr "正在删除软件包签名%s..."
+msgstr "正在删除软件包签名 %s ..."
+
+msgid "Done."
+msgstr "完成。"
 
 msgid "Finish removing package %s from REPO: %s."
-msgstr "软件包%s从软件源%s中删除完毕。"
+msgstr "软件包 %s 从软件源 %s 中删除完毕。"
 
 msgid "Finish removing package %s (versions %s) from REPO: %s."
-msgstr "软件包%s(版本%s)从软件源%s中删除完毕。"
+msgstr "软件包 %s (版本 %s )从软件源 %s 中删除完毕。"
 
 msgid "Package %s do not exist in repo."
-msgstr "软件%s在软件源中不存在。"
+msgstr "软件 %s 在软件源中不存在。"
 
 msgid "Checking %s packages in REPO %s ...\\n%s"
-msgstr "有%s个软件在软件源%s中等待检查...\\n%s"
+msgstr "有 %s 个软件在软件源 %s 中等待检查...\\n%s"
 
 msgid "(%s/%s) %s : Checking package ..."
 msgstr "(%s/%s) %s : 正在检查软件 ..."
@@ -192,16 +172,16 @@ msgid "Ignore."
 msgstr "忽略。"
 
 msgid "%s versions(%s) in pool."
-msgstr "pool中有%s个版本（%s）。"
+msgstr "pool中有 %s 个版本（%s）。"
 
 msgid "Latest version %s in os."
-msgstr "os中最新版本应该是%s。"
+msgstr "os中最新版本应该是 %s。"
 
 msgid "Report:"
 msgstr "报告："
 
 msgid "%s In %s"
-msgstr "%s 在%s中"
+msgstr "%s 在 %s 中"
 
 msgid "All files are fine."
 msgstr "所有文件均完好。"
@@ -213,54 +193,54 @@ msgid "%s Excess files:"
 msgstr "%s 多余的文件："
 
 msgid "In %s:\\n%s"
-msgstr "在%s中：\\n%s"
+msgstr "在 %s 中：\\n%s"
 
 msgid "None."
 msgstr "无。"
 
 msgid "%s packages in REPO: %s."
-msgstr "有%s个软件位于软件源%s中。"
+msgstr "有 %s 个软件位于软件源 %s 中。"
 
 msgid "%s packages in list_AUR:\\n%s"
-msgstr "其中%s个软件存在于list_AUR中：\\n%s"
+msgstr "其中 %s 个软件存在于list_AUR中：\\n%s"
 
 msgid "%s packages not in list_AUR:\\n%s"
-msgstr "另外%s个软件不在list_AUR中：\\n%s"
+msgstr "另外 %s 个软件不在list_AUR中：\\n%s"
 
 msgid ""
 "Use 'add [names]' or 'del [names]' to add(delete) package to(from) list_AUR."
-msgstr "用命令'add [names]'或'del [names]'在list_AUR中添加或删除软件名。"
+msgstr "用命令 'add [names]' 或 'del [names]' 在 list_AUR 中添加或删除软件名。"
 
 msgid "Use 'finish' to exit this loop."
-msgstr "用命令'finish'结束添加或删除。"
+msgstr "用命令 'finish' 结束添加或删除。"
 
 msgid "Enter you command: "
 msgstr "请输入您的命令："
 
 msgid "Ignore %s, because %s is not in %s."
-msgstr "忽略%s，因为软件%s不在%s中。"
+msgstr "忽略 %s ，因为软件 %s 不在 %s 中。"
 
 msgid "Nothing to do with list_AUR."
-msgstr "无需修改list_AUR。"
+msgstr "无需修改 list_AUR。"
 
 msgid "Adding %s to list_AUR ..."
-msgstr "正在把%s加到list_AUR中 ..."
+msgstr "正在把 %s 加到 list_AUR 中 ..."
 
 msgid "deleting %s from list_AUR ..."
-msgstr "正在从list_AUR中删除%s ..."
+msgstr "正在从 list_AUR 中删除 %s ..."
 
 msgid "Unknown command."
 msgstr "未知命令。"
 
 msgid "No change of list_AUR, no need to renew pool database %s ..."
-msgstr "list_AUR没有更改，所以pool的数据库%s不需更新。"
+msgstr "list_AUR 没有更改，所以 pool 的数据库 %s 不需更新。"
 
 msgid "There are %s packages in list_AUR:\\n%s"
-msgstr "有%s个软件存在于list_AUR中：\\n%s"
+msgstr "有 %s 个软件存在于 list_AUR 中：\\n%s"
 
 msgid ""
 "We will begin to get information of these packages from AUR in 3 seconds."
-msgstr "3秒后开始从AUR获取这些软件的信息。"
+msgstr "3秒后开始从 AUR 获取这些软件的信息。"
 
 msgid "(%s/%s) %s : Ignore."
 msgstr "(%s/%s) %s：忽略。"
@@ -272,7 +252,7 @@ msgid "(%s/%s) %s : Receiving information from AUR ..."
 msgstr "(%s/%s) %s : 正在从AUR获得相关信息..."
 
 msgid "local newest : %s; aur version : %s"
-msgstr "本地最新版本：%s; AUR上的版本：%s"
+msgstr "本地最新版本： %s; AUR上的版本： %s"
 
 msgid "Need to update"
 msgstr "需要升级"
@@ -287,22 +267,22 @@ msgid "Overview, no package need to update."
 msgstr "概述，没有软件需要升级。"
 
 msgid "Overview, %s packages need to update:\\n%s"
-msgstr "概述，%s个软件需要升级：\\n%s"
+msgstr "概述， %s 个软件需要升级：\\n%s"
 
 msgid "(%s/%s) Updating package %s(%s=>%s) from AUR"
-msgstr "(%s/%s) 正在从AUR升级软件%s,版本从%s到%s"
+msgstr "(%s/%s) 正在从AUR升级软件 %s ,版本从 %s 到 %s"
 
 msgid "Failed to run `makepkg`: %s"
 msgstr "运行`makepkg`失败 : %s。"
 
 msgid "Update package %s(%s=>%s) from AUR, done."
-msgstr "从AUR升级软件%s（版本从%s到%s），完毕。"
+msgstr "从AUR升级软件 %s（版本从 %s 到 %s），完毕。"
 
 msgid "Tarball of %s is broken."
-msgstr "%s的源码包已损坏。"
+msgstr "%s 的源码包已损坏。"
 
 msgid "Finish updating %s packages."
-msgstr "%s个软件升级完成。"
+msgstr "%s 个软件升级完成。"
 
 msgid "Success: %s\\n%s"
 msgstr "成功：%s个\\n%s"
@@ -311,18 +291,18 @@ msgid "Fail: %s\\n%s"
 msgstr "失败：%s个\\n%s"
 
 msgid "%s packages not found in AUR:\\n%s"
-msgstr "%s个软件没在AUR中找到：\\n%s"
+msgstr "%s 个软件没在AUR中找到：\\n%s"
 
 msgid ""
 "These packages may be moved into repo community, or your network cannot "
 "connect to AUR %s."
-msgstr "这些软件可能已被移到community仓库，或者是因为你的网络无法连接到AUR %s."
+msgstr "这些软件可能已被移到 community 仓库，或者是因为你的网络无法连接到 AUR %s."
 
 msgid "Overview, no git or svn package in repo: %s."
-msgstr "概述，软件源%s中无 -git -svn 类的软件。"
+msgstr "概述，软件源 %s 中无 -git -svn 类的软件。"
 
 msgid "Overview, %s git or svn packages need to update:\\n%s"
-msgstr "概述，%s个 -git -svn 类的软件需要升级：\\n%s"
+msgstr "概述， %s 个 -git -svn 类的软件需要升级：\\n%s"
 
 msgid "(%s/%s) %s :"
 msgstr "(%s/%s) %s : "
@@ -340,13 +320,70 @@ msgid "In pkg file names:"
 msgstr "软件包文件名称中："
 
 msgid "Source file : %s(%s, %s)"
-msgstr "源码包文件：%s(%s, %s)"
+msgstr "源码包文件： %s(%s, %s)"
 
 msgid "pkg files :\\n%s"
 msgstr "软件包文件：\\n%s"
 
 msgid "More information :\\n%s"
 msgstr "更多信息：\\n%s"
+
+msgid "Receiving information from AUR ..."
+msgstr "正在从 AUR 获得相关信息..."
+
+msgid "Check you network, please."
+msgstr "请检查您的网络。"
+
+msgid "1. about Version ..."
+msgstr "1. 版本 ..."
+
+msgid "2. about tarball URL path ..."
+msgstr "2. tarball 下载地址 ..."
+
+msgid "3. about Maintainer ..."
+msgstr "3. 维护人 ..."
+
+msgid "Lost Directory:\\n%s"
+msgstr "缺失目录：\\n%s"
+
+msgid "Checking key signatures for '%s' ..."
+msgstr "正在检查 %s 的密钥签名 ..."
+
+msgid "Chrooting into %s to Build i686 package."
+msgstr "正在 chroot 到 %s 以构建 i686 软件包。"
+
+msgid "Build i686 package .. failed."
+msgstr "构建 i686 架构的软件包 .. 失败。"
+
+msgid "Merging two different source files ..."
+msgstr "正在合并两个不同的源码包文件 ..."
+
+msgid "Renew pool database failed."
+msgstr "更新 pool 的数据库失败。"
+
+msgid "This should never happen to you !"
+msgstr "不该发生的错误！"
+
+msgid "Adding pkg %s to repo database (%s) ..."
+msgstr "添加软件包 %s 到源数据库 (%s) ..."
+
+msgid "Making links for %s ..."
+msgstr "为 %s 创建链接文件..."
+
+msgid "Remove old links first ..."
+msgstr "在此之前先删除旧的链接..."
+
+msgid "Renew repo database (%s) ..."
+msgstr "更新软件源 %s 架构的数据库 ..."
+
+msgid "(%s)Done."
+msgstr "(%s)完成。"
+
+msgid "Removing pkg %s from repo database (%s) ..."
+msgstr "从源数据库中删除软件包 %s (%s) ..."
+
+msgid "Remove links for %s ..."
+msgstr "删除 %s 的链接文件..."
 
 msgid "This program may be freely redistributed under"
 msgstr "在GNU一般公众许可条款下"
@@ -367,7 +404,7 @@ msgid "  -C, --check            check repo, link, signature and so on"
 msgstr "  -C, --check              检查软件源，软件包、链接、签名等"
 
 msgid "  -E, --editaur          edit 'list_AUR'"
-msgstr "  -E, --editaur            编辑'list_AUR'"
+msgstr "  -E, --editaur            编辑 'list_AUR'"
 
 msgid "  -I, --info             view package information"
 msgstr "  -I, --info               查看软件相关信息"
@@ -379,10 +416,10 @@ msgid "  -S, --search <key>     search package in your repo"
 msgstr "  -S, --search <关键字>    在软件源中搜索软件、软件包"
 
 msgid "  -U, --update           update packages in 'list_AUR' from AUR"
-msgstr "  -U, --update             从AUR升级'list_AUR'中的软件"
+msgstr "  -U, --update             从 AUR 升级 'list_AUR' 中的软件"
 
 msgid "  -m, --multi            get AUR information with multi threads"
-msgstr "  -m, --multi              多线程从AUR获取信息"
+msgstr "  -m, --multi              多线程从 AUR 获取信息"
 
 msgid "  -v, --verbose          be verbose"
 msgstr "  -v, --verbose            显示详细信息"
@@ -415,48 +452,20 @@ msgid "Notes:"
 msgstr "注意："
 
 msgid "%s Here, 'package' refers to pkgs per architecture grouped by pkgbase."
-msgstr "%s 这里的软件(package)是指以pkgbase为分组的不同架构下所有的软件包。"
+msgstr "%s 这里的软件 (package) 是指以 pkgbase 为分组的不同架构下所有的软件包。"
 
 msgid ""
 "%s With option -A, pkgs you have built must be in the same DIR with srcfile."
-msgstr "%s 选项-A,需要您把自己已创建的软件包与源码包放在同一目录。"
+msgstr "%s 选项 -A ,需要您把自己已创建的软件包与源码包放在同一目录。"
 
 msgid "%s With option -R, package will be removed into %s."
-msgstr "%s 选项-R，将会把软件删除到%s中。"
+msgstr "%s 选项 -R ，将会把软件删除到 %s 中。"
 
 msgid ""
 "%s Option --ignore or --only, only work with option -C or -U to save your "
 "time."
-msgstr "%s 选项--ignore或--only，仅可以配合-C或-U用来节省时间。"
+msgstr "%s 选项 --ignore 或 --only ，仅可以配合 -C 或 -U 来节省时间。"
 
 msgid "%s Use option --git after -U is a good choice."
-msgstr "%s 使用选项-U之后再使用--git比较好。"
-
-msgid "Lost '%s', edit configure file %s."
-msgstr "变量 '%s' 未赋值，请编辑配置文件 %s 。"
-
-msgid "Checking key signatures for '%s' ..."
-msgstr "正在检查 %s 的密钥签名 ..."
-
-msgid "Lost configure file %s !"
-msgstr "无法找到配置文件：%s！"
-
-msgid " A myrepo is running!"
-msgstr "有一个 myrepo 已在运行！"
-
-msgid "If you're sure a myrepo is not already running, you can remove %s."
-msgstr "如果你确定没有 myrepo 在运行，你可以删除 %s。"
-
-msgid ""
-"Some REPO directories or files do not exist. Use '--init' to initialize "
-"repo, or check them by youself!"
-msgstr ""
-"软件源的一些目录或文件不存在。用'--init'初始化软件源，或者先手动检查一下它"
-"们！"
-
-msgid "At least one operation of '%s', please."
-msgstr "请至少指定‘%s’中的一个操作。"
-
-msgid "All files in %s will be removed !"
-msgstr "%s中所有的文件将被删除！"
+msgstr "%s 使用选项 -U 之后再使用 --git 比较好。"
 

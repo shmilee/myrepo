@@ -27,11 +27,13 @@ build() {
 
 package() {
     cd "$srcdir/$_gitname"
-    install -Dm644 myrepo.conf "$pkgdir"/etc/myrepo.conf
-    install -Dm755 myrepo.sh "$pkgdir"/usr/bin/myrepo
-    install -Dm755 multi-dl.py "$pkgdir"/usr/lib/myrepo/multi-dl.py
-    install -Dm755 get_aur_info.sh "$pkgdir"/usr/lib/myrepo/get_aur_info.sh
-    cd po
+    install -Dm644 etc/myrepo.conf "$pkgdir"/etc/myrepo.conf
+    install -Dm755 bin/myrepo.sh "$pkgdir"/usr/bin/myrepo
+    cd lib/
+    for file in base.sh cmds.sh utils.sh multi-dl.py dl_aur_info.sh; do
+        install -Dm755 $file "$pkgdir"/usr/lib/myrepo/$file
+    done
+    cd ../po/
     for lan in *.mo; do
         install -Dm644 $lan "$pkgdir"/usr/share/locale/${lan%.mo}/LC_MESSAGES/myrepo.mo
     done
