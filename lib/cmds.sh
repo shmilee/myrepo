@@ -268,7 +268,7 @@ check_repo() { #{{{
                 if [[ ! -f $SRCS/$name-$ver.src.tar.gz ]];then
                     sta+="source_file_lost,_"
                 else
-                    sed -i "/$name-$ver.src.tar.gz/d" $TEMP/check/sourcefiles.list
+                    sed -i "/^$name-$ver.src.tar.gz$/d" $TEMP/check/sourcefiles.list
                 fi
                 for pfile in $(cat $TEMP/pooldb/$name/$ver); do
                     if [[ ! -f $PKGS/$pfile ]];then
@@ -314,7 +314,7 @@ check_repo() { #{{{
                     fi
                     sed -i "/^$pfile$/d;/^$pfile.sig$/d" $TEMP/check/$_a.pkglist
                     if grep ^$pfile$ $TEMP/check/$_a.repodb 2>&1 >/dev/null;then
-                        sed -i "/$pfile/d" $TEMP/check/$_a.repodb
+                        sed -i "/^$pfile$/d" $TEMP/check/$_a.repodb
                     else
                         sta+="$pfile(${_a})_lost_in_repodb,_"
                     fi
