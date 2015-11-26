@@ -324,7 +324,7 @@ info_pool_db() { #{{{
 ## ln pkgs and signatures that should exist in $PKGS to repo, add(remove) pkgs to database
 # usage  : ln_repo_db [-a|-r] [PkgFileName]
 ln_repo_db() { #{{{
-    local _a _pf=$2 oldp oldlns anti_O_V
+    local _a _pf=$2 oldp oldlns anti_O_V _repo_sign
     local name=$(get_namver -n $_pf)
     local _arch=${_pf##*-}; _arch=${_arch%.pkg.tar*}
     [[ "$_arch" == "any" ]] && _arch="i686 x86_64" # if arch='any', let's do it twice
@@ -335,6 +335,9 @@ ln_repo_db() { #{{{
     fi
     if [[ x"$O_V" == x ]];then
         anti_O_V="-q"
+    fi
+    if [[ "$SIGN" == "1" ]];then
+        _repo_sign="-s -k $USER_ID"
     fi
     if [[ "$1" == "-a" ]];then
         for _a in $_arch; do
@@ -353,8 +356,8 @@ ln_repo_db() { #{{{
             ln -s ${O_V} ../../pool/packages/$_pf $dir/$_pf
             [ -f $PKGS/$_pf.sig ] && ln -s ${O_V} ../../pool/packages/$_pf.sig $dir/$_pf.sig
             msg2 "$(gettext "Renew repo database (%s) ...")" "$_a"
-            repo-add $anti_O_V $dir/$REPO_NAME.db.tar.gz $dir/$_pf
-            repo-add $anti_O_V -f $dir/$REPO_NAME.files.tar.gz $dir/$_pf
+            repo-add $anti_O_V $_repo_sign $dir/$REPO_NAME.db.tar.gz $dir/$_pf
+            repo-add $anti_O_V $_repo_sign -f $dir/$REPO_NAME.files.tar.gz $dir/$_pf
             msg2 "$(gettext "(%s)Done.")" "$_a"
         done
     elif [[ "$1" == "-r" ]];then
@@ -365,8 +368,8 @@ ln_repo_db() { #{{{
             [ -L $dir/$_pf ] && rm ${O_V} $dir/$_pf
             [ -L $dir/$_pf.sig ] && rm ${O_V} $dir/$_pf.sig
             msg2 "$(gettext "Renew repo database (%s) ...")" "$_a"
-            repo-remove $anti_O_V $dir/$REPO_NAME.db.tar.gz "$(get_namver -n $_pf)"
-            repo-remove $anti_O_V -f $dir/$REPO_NAME.files.tar.gz "$(get_namver -n $_pf)"
+            repo-remove $anti_O_V $_repo_sign $dir/$REPO_NAME.db.tar.gz "$(get_namver -n $_pf)"
+            repo-remove $anti_O_V $_repo_sign -f $dir/$REPO_NAME.files.tar.gz "$(get_namver -n $_pf)"
             msg2 "$(gettext "(%s)Done.")" "$_a"
         done
     else
