@@ -357,7 +357,6 @@ ln_repo_db() { #{{{
             [ -f $PKGS/$_pf.sig ] && ln -s ${O_V} ../../pool/packages/$_pf.sig $dir/$_pf.sig
             msg2 "$(gettext "Renew repo database (%s) ...")" "$_a"
             repo-add $anti_O_V $_repo_sign $dir/$REPO_NAME.db.tar.gz $dir/$_pf
-            repo-add $anti_O_V $_repo_sign -f $dir/$REPO_NAME.files.tar.gz $dir/$_pf
             msg2 "$(gettext "(%s)Done.")" "$_a"
         done
     elif [[ "$1" == "-r" ]];then
@@ -369,7 +368,6 @@ ln_repo_db() { #{{{
             [ -L $dir/$_pf.sig ] && rm ${O_V} $dir/$_pf.sig
             msg2 "$(gettext "Renew repo database (%s) ...")" "$_a"
             repo-remove $anti_O_V $_repo_sign $dir/$REPO_NAME.db.tar.gz "$(get_namver -n $_pf)"
-            repo-remove $anti_O_V $_repo_sign -f $dir/$REPO_NAME.files.tar.gz "$(get_namver -n $_pf)"
             msg2 "$(gettext "(%s)Done.")" "$_a"
         done
     else
