@@ -14,7 +14,7 @@
 export TEXTDOMAIN='myrepo'
 export TEXTDOMAINDIR='/usr/share/locale'
 
-MYVER=0.9
+MYVER=1.0
 CONF_FILE=/etc/myrepo.conf
 LIBPATH=/usr/lib/myrepo
 
