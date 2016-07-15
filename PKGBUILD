@@ -8,6 +8,7 @@ arch=('any')
 url="https://github.com/shmilee/myrepo"
 license=('GPL')
 depends=('pacman' 'grep' 'devtools')
+optdepends=('python: multi-threads get AUR information')
 backup=('etc/myrepo.conf')
 source=(git://github.com/shmilee/${_gitname}.git)
 md5sums=(SKIP)
