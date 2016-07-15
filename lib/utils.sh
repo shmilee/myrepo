@@ -265,7 +265,7 @@ version_changed() { #{{{
     local name=$(basename $1)
     cd $1
     local oldVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD |sed -e 's/"//g' -e "s/'//g")
-    makepkg -o
+    makepkg -o -d
     local newVer=$(awk '/^pkgver=/,sub(/pkgver=/,"",$1){printf $1}' PKGBUILD |sed -e 's/"//g' -e "s/'//g")
     if [ "$oldVer" != "$newVer" ];then
         echo $newVer > $name-newver #newVersion file
