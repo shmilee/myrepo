@@ -215,13 +215,13 @@ dual_makepkg() { #{{{
     fi
     cd $1
 
-    if ! makepkg --allsource; then
+    if ! makepkg -s --allsource; then
         BUILD_RESULT="No source file build!"
         return 1
     fi
     # arch==any, arch==i686 x86_64, arch==x86_64
     if inclusion x86_64 $arch; then
-        if ! makechrootpkg -r $x86_64_ROOT; then
+        if ! makechrootpkg -u -r $x86_64_ROOT; then
             BUILD_RESULT="No pkg build!"
             return 2
         fi
@@ -234,7 +234,7 @@ dual_makepkg() { #{{{
             return 3
         fi
         msg "$(gettext "Chrooting into %s to Build i686 package.")" "$i686_ROOT"
-        makechrootpkg -r $i686_ROOT
+        makechrootpkg -u -r $i686_ROOT
         if [[ $? != 0 ]];then
             msg "$(gettext "Build i686 package .. failed.")"
             BUILD_RESULT+="i686 pkg failed."
