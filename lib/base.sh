@@ -82,7 +82,7 @@ inclusion() {
 
 # check value of variable
 # return : no value 0; else 1
-no_va() {
+no_value() {
     local var=$1
     eval local value=\$$var
     if [[ x"$value" == x ]]; then

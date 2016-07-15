@@ -54,7 +54,7 @@ for file in $LIBPATH/{base.sh,utils.sh,cmds.sh}; do
 done
 
 for var in AURURL REPO_PATH REPO_NAME TEMP USE_COLOR SIGN; do
-    if no_va $var; then
+    if no_value $var; then
         error "$(gettext "Lost '%s', edit configure file %s.")" "$var" "$CONF_FILE"
         exit  1
     fi
@@ -135,11 +135,11 @@ else
     fi
     # check chrootdir with -U --git
     if echo $OPER|grep -E 'U|G' >/dev/null;then
-        if no_va x86_64_ROOT || [ ! -d "$x86_64_ROOT" ]; then
+        if no_value x86_64_ROOT || [ ! -d "$x86_64_ROOT" ]; then
             error "$(gettext "Lost '%s', edit configure file %s.")" "x86_64_ROOT" "$CONF_FILE"
             exit 1
         fi
-        if no_va i686_ROOT || [ ! -d "$i686_ROOT" ]; then
+        if no_value i686_ROOT || [ ! -d "$i686_ROOT" ]; then
             warning "$(gettext "Lost '%s', edit configure file %s.")" "i686_ROOT" "$CONF_FILE"
         fi
     fi

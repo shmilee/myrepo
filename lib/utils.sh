@@ -25,7 +25,7 @@ check_user_id() { #{{{
     if [ $SIGN != 1 ];then
         return 0
     fi
-    if no_va USER_ID; then
+    if no_value USER_ID; then
         error "$(gettext "Lost '%s', edit configure file %s.")" "USER_ID" "$CONF_FILE"
         exit 1
     fi
