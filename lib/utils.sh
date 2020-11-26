@@ -230,8 +230,8 @@ dual_makepkg() { #{{{
     # build i686 package, when arch==i686, arch==i686 x86_64
     if inclusion i686 $arch; then
         if [ x"$i686_ROOT" == x ]; then
-            BUILD_RESULT="i686 pkg failed. Lost 'i686_ROOT' directory."
-            return 3
+            warning "$(gettext "Lost 'i686_ROOT' directory. Skip building i686 pkg!")"
+            return 0
         fi
         msg "$(gettext "Chrooting into %s to Build i686 package.")" "$i686_ROOT"
         makechrootpkg -u -r $i686_ROOT
