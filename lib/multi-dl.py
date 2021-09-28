@@ -15,7 +15,7 @@ import sys
 ui = None
 def signal_handler(signal, frame):
     ui.quiet()
-    while ui.isAlive():pass
+    while ui.is_alive():pass
     sys.exit(1)
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -127,7 +127,7 @@ class UI(Thread):
                 nts = [] #没有启动的线程
                 ets = [] #已经结束的线程
                 for d in self.downs:
-                    if d.isAlive():ats.append(d)
+                    if d.is_alive():ats.append(d)
                     elif d.nstart:nts.append(d)
                     else:ets.append(d)
                 if self.autoscroll and len(ats) > 0:self.select = ats[0].index * 2 - 2
@@ -136,7 +136,7 @@ class UI(Thread):
                 if asts > 0:
                     for i in range(asts):
                         nts[i].start()
-                        while not nts[i].isAlive() : time.sleep(0.1)
+                        while not nts[i].is_alive() : time.sleep(0.1)
                         ats.append(nts[i])
                     nts = nts[asts:]
                 # Update UI
