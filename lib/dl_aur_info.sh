@@ -37,13 +37,13 @@ if curl -LfGs --data-urlencode arg="$pkg" "$INFOURL" >${file_p}.tmp; then
         echo "0" > ${file_p}
     else
         msg2 "$(gettext "1. about Version ...")"
-        sed 's/.*Version\":\"//;s/\",\".*//' ${file_p}.tmp >${file_p}
+        sed 's/.*Version\":\"//;s/\".*//' ${file_p}.tmp >${file_p}
         msg2 "$(gettext "2. about tarball URL path ...")"
         echo >>${file_p}
-        sed 's/^.*URLPath\":\"//;s/\",\".*//;s/\\//g' ${file_p}.tmp >>${file_p}
+        sed 's/^.*URLPath\":\"//;s/\".*//;s/\\//g' ${file_p}.tmp >>${file_p}
         msg2 "$(gettext "3. about Maintainer ...")"
         echo >>${file_p}
-        sed 's/.*Maintainer\":\"//;s/\",\".*//' ${file_p}.tmp >>${file_p}
+        sed 's/.*Maintainer\":\"//;s/\".*//' ${file_p}.tmp >>${file_p}
     fi
     exit 0
 else
