@@ -10,8 +10,8 @@ license=('GPL')
 depends=('pacman' 'grep' 'devtools')
 optdepends=('python: multi-threads get AUR information')
 backup=('etc/myrepo.conf')
-source=(git://github.com/shmilee/${_gitname}.git)
-md5sums=(SKIP)
+source=("git+https://github.com/shmilee/${_gitname}.git")
+md5sums=('SKIP')
 
 pkgver() {
   cd "$srcdir/$_gitname"
