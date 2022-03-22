@@ -5,7 +5,7 @@ export TEXTDOMAIN='myrepo'
 export TEXTDOMAINDIR='/usr/share/locale'
 
 source /etc/myrepo.conf
-INFOURL="$AURURL/rpc/?v=5\&type=info"
+INFOURL="$AURURL/rpc/?v=5&type=info"
 if [ x$1 = 'x-s' ]; then
     source $(dirname $0)/base.sh
     msg2() {
@@ -28,7 +28,7 @@ pkg=$2
 file_p=$TEMP/list_info/$pkg
 
 msg2 "$(gettext "Receiving information from AUR ...")"
-if curl -LfGs --data-urlencode arg="$pkg" $INFOURL >${file_p}.tmp; then
+if curl -LfGs --data-urlencode arg="$pkg" "$INFOURL" >${file_p}.tmp; then
     if [ ! -s ${file_p}.tmp ]; then
         error "$(gettext "Check you network, please.")"
         exit 1
